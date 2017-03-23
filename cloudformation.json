@@ -158,7 +158,7 @@
           }
         ],
 		"IamInstanceProfile": {
-               "Ref": "RootInstanceProfile"
+               "Ref": "InstanceS3Profile"
         }	
       }
 	},
@@ -194,12 +194,12 @@
           }
         ],
 		"IamInstanceProfile": {
-               "Ref": "RootInstanceProfile"
+               "Ref": "InstanceS3Profile"
             }
       }
 	},
  
-	"RootRole": {
+	"InstRole": {
          "Type": "AWS::IAM::Role",
          "Properties": {
             "AssumeRolePolicyDocument": {
@@ -219,24 +219,53 @@
       "RolePolicies": {
          "Type": "AWS::IAM::Policy",
          "Properties": {
-            "PolicyName": "root",
+            "PolicyName": "s3policy",
             "PolicyDocument": {
                "Version" : "2012-10-17",
                "Statement": [ {
                   "Effect": "Allow",
-                  "Action": "*",
-                  "Resource": "*"
-               } ]
+				  "Action":[
+            "s3:ListAllMyBuckets"
+         ],
+         "Resource":"arn:aws:s3:::*"
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:ListBucket",
+            "s3:GetBucketLocation"
+         ],
+                           "Resource": [{
+                        "Fn::Join": [ "", [
+                        "arn:aws:s3:::", {
+                        "Ref": "myS3Bucket"
+                           }
+                         ]
+                      ]
+                  }]
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:DeleteObject"
+         ],
+		 "Resource": [{
+			   "Fn::Join": [ "", ["arn:aws:s3:::", {"Ref": "myS3Bucket"},     "/*"]
+			    ]
+		       }]
+             } ]
             },
-            "Roles": [ { "Ref": "RootRole" } ]
+        "Roles": [ { "Ref": "InstRole" } ]
          }
       },
 	  
-      "RootInstanceProfile": {
+      "InstanceS3Profile": {
          "Type": "AWS::IAM::InstanceProfile",
          "Properties": {
             "Path": "/",
-            "Roles": [ { "Ref": "RootRole" } ]
+            "Roles": [ { "Ref": "InstRole" } ]
          }
       },
   
