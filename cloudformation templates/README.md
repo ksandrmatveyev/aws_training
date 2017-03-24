@@ -1,0 +1,9 @@
+# aws_training
+template1.json
+inst2vol_elasIP2_s3_s3access_vpc1_pubsubnet3aval_intqw_routes
+
+template2.json
+inst2vol_elasIP2_s3_roots3access_vpc1_pubsubnet3aval_intqw_routes
+
+template3.json
+2instance_elasticIPs_s3_volumes_LB

@@ -1,0 +1,186 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "AWS Task1",
+
+
+   
+  "Resources" : {
+
+
+  
+  
+  
+    "SecGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "AWS Task1 Security Group",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort" : "80", 
+            "ToPort" : "80",
+            "CidrIp": "0.0.0.0/0"
+          },
+		  {
+            "IpProtocol": "tcp",
+            "FromPort" : "22", 
+            "ToPort" : "22",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+
+	"myS3Bucket" : {
+      "Type" : "AWS::S3::Bucket"
+    },	
+
+    "Instance01" : {
+      "Type" : "AWS::EC2::Instance",
+      "DependsOn" : "SecGroup",
+      "Properties" : {
+        "ImageId" : "ami-1c221e76",
+		"BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeType": "standard",
+			  "DeleteOnTermination" : "true",
+              "VolumeSize": "10"
+            }
+          }
+        ],
+        "KeyName" : "awskeytest",
+        "InstanceType" : "t2.micro",
+        "AvailabilityZone" : "us-east-1b",
+        "SecurityGroups" : [{ "Ref" : "SecGroup" }],
+        "Tags" : [
+          {
+            "Key" : "Name",
+            "Value" : "inst01"
+          }
+        ],
+		"IamInstanceProfile": {
+               "Ref": "RootInstanceProfile"
+            }
+	  }	
+    },
+
+    "Instance02" : {
+       "Type" : "AWS::EC2::Instance",
+       "DependsOn" : "SecGroup",
+       "Properties" : {
+         "ImageId" : "ami-1c221e76",
+		 "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeType": "standard",
+			  "DeleteOnTermination" : "true",
+              "VolumeSize": "10"
+            }
+          }
+        ],
+        "KeyName" : "awskeytest",
+         "InstanceType" : "t2.micro",
+         "AvailabilityZone" : "us-east-1c",
+         "SecurityGroups" : [{ "Ref" : "SecGroup" }],
+         "Tags" : [
+          {
+            "Key" : "Name",
+            "Value" : "inst02"
+          }
+        ],
+		"IamInstanceProfile": {
+               "Ref": "RootInstanceProfile"
+            }
+	   }	
+     },
+	 
+	       "RootRole": {
+         "Type": "AWS::IAM::Role",
+         "Properties": {
+            "AssumeRolePolicyDocument": {
+               "Version" : "2012-10-17",
+               "Statement": [ {
+                  "Effect": "Allow",
+                  "Principal": {
+                     "Service": [ "ec2.amazonaws.com" ]
+                  },
+                  "Action": [ "sts:AssumeRole" ]
+               } ]
+            },
+            "Path": "/"
+         }
+      },
+	  
+      "RolePolicies": {
+         "Type": "AWS::IAM::Policy",
+         "Properties": {
+            "PolicyName": "root",
+            "PolicyDocument": {
+               "Version" : "2012-10-17",
+               "Statement": [ {
+                  "Effect": "Allow",
+                  "Action": "*",
+                  "Resource": "*"
+               } ]
+            },
+            "Roles": [ { "Ref": "RootRole" } ]
+         }
+      },
+	  
+      "RootInstanceProfile": {
+         "Type": "AWS::IAM::InstanceProfile",
+         "Properties": {
+            "Path": "/",
+            "Roles": [ { "Ref": "RootRole" } ]
+         }
+      },
+	 
+	 
+	"ElasticIP01":{
+       "Type":"AWS::EC2::EIP",
+       "Properties":{
+       "InstanceId":{
+         "Ref":"Instance01"
+         }
+        }
+	},
+
+	"ElasticIP02":{
+       "Type":"AWS::EC2::EIP",
+       "Properties":{
+       "InstanceId":{
+         "Ref":"Instance02"
+         }
+        }
+	},
+	
+	
+     "LoadBalncr" : {
+       "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+       "Properties" : {
+         "AvailabilityZones" : [ "us-east-1b", "us-east-1c" ],
+         "Instances" : [
+           { "Ref" : "Instance01" },
+           { "Ref" : "Instance02" }
+         ],
+         "Listeners" : [ 
+           {
+             "LoadBalancerPort" : "80",
+             "InstancePort" : "80",
+             "Protocol" : "HTTP"
+           }
+         ],
+         "HealthCheck" : {
+            "Target" : "HTTP:80/",
+            "HealthyThreshold" : "2",
+            "UnhealthyThreshold" : "2",
+            "Interval" : "15",
+            "Timeout" : "5"
+         }
+       }
+     }
+  }
+}
