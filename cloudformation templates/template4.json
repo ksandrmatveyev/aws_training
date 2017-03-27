@@ -1,0 +1,485 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS Task1",
+    "Resources": {
+ 		"VPC" : {
+		  "Type" : "AWS::EC2::VPC",
+		  "Properties" : {
+			"CidrBlock" : "10.0.0.0/16",
+			"Tags" : [
+			  {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+			  {"Key" : "Network", "Value" : "Public" }
+			]
+		  }
+		},
+
+		"PublicSubnet" : {
+		  "Type" : "AWS::EC2::Subnet",
+		  "Properties" : {
+			"VpcId" : { "Ref" : "VPC" },
+			"CidrBlock" : "10.0.0.0/24",
+			"Tags" : [
+			  {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+			  {"Key" : "Network", "Value" : "Public" }
+			]
+		  }
+		},
+
+		"InternetGateway" : {
+		  "Type" : "AWS::EC2::InternetGateway",
+		  "Properties" : {
+			"Tags" : [
+			  {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+			  {"Key" : "Network", "Value" : "Public" }
+			]
+		  }
+		},
+
+		"AttachGateway" : {
+		   "Type" : "AWS::EC2::VPCGatewayAttachment",
+		   "Properties" : {
+			 "VpcId" : { "Ref" : "VPC" },
+			 "InternetGatewayId" : { "Ref" : "InternetGateway" }
+		   }
+		},
+
+		"PublicRouteTable" : {
+		  "Type" : "AWS::EC2::RouteTable",
+		  "Properties" : {
+			"VpcId" : {"Ref" : "VPC"},
+			"Tags" : [
+			  {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+			  {"Key" : "Network", "Value" : "Public" }
+			]
+		  }
+		},
+
+		"PublicRoute" : {
+		  "Type" : "AWS::EC2::Route",
+		  "DependsOn" : "AttachGateway",
+		  "Properties" : {
+			"RouteTableId" : { "Ref" : "PublicRouteTable" },
+			"DestinationCidrBlock" : "0.0.0.0/0",
+			"GatewayId" : { "Ref" : "InternetGateway" }
+		  }
+		},
+
+		"PublicSubnetRouteTableAssociation" : {
+		  "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+		  "Properties" : {
+			"SubnetId" : { "Ref" : "PublicSubnet" },
+			"RouteTableId" : { "Ref" : "PublicRouteTable" }
+		  }
+		},
+	   "PrivateSubnet" : {
+		  "Type" : "AWS::EC2::Subnet",
+		  "Properties" : {
+			"VpcId" : { "Ref" : "VPC" },
+			"CidrBlock" : "10.0.1.0/24",
+			"Tags" : [
+			  {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+			  {"Key" : "Network", "Value" : "Private" }
+			]
+		  }
+		},
+
+		"PrivateRouteTable" : {
+		  "Type" : "AWS::EC2::RouteTable",
+		  "Properties" : {
+			"VpcId" : {"Ref" : "VPC"},
+			"Tags" : [
+			  {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+			  {"Key" : "Network", "Value" : "Private" }
+			]
+		  }
+		},
+
+		"PrivateSubnetRouteTableAssociation" : {
+		  "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+		  "Properties" : {
+			"SubnetId" : { "Ref" : "PrivateSubnet" },
+			"RouteTableId" : { "Ref" : "PrivateRouteTable" }
+		  }
+		},
+		
+        "NatSecurityGroup": {
+		    "DependsOn" : ["VPC"],
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "GroupDescription": "AWS Task1 Security Group",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "10.0.1.0/24"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": "10.0.1.0/24"
+                    },
+                    {
+                        "IpProtocol": "icmp",
+                        "FromPort": "-1",
+                        "ToPort": "-1",
+                        "CidrIp": "10.0.1.0/24"
+                    }
+                ],
+				 "SecurityGroupEgress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+					{
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "10.0.1.0/24"
+                    },
+					{
+                        "IpProtocol": "icmp",
+                        "FromPort": "-1",
+                        "ToPort": "-1",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "PublicInstanceSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "GroupDescription": "AWS Task1 Security Group",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "icmp",
+                        "FromPort": "-1",
+                        "ToPort": "-1",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "PrivateInstanceSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "GroupDescription": "AWS Task1 Security Group",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "10.0.0.0/24"
+                    }
+                ],
+				"SecurityGroupEgress": [
+                    {
+                        "IpProtocol": "icmp",
+                        "FromPort": "-1",
+                        "ToPort": "-1",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+					{
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },		
+        "myS3Bucket": {
+            "Type": "AWS::S3::Bucket"
+        },
+		"NatInstance": {
+		        "DependsOn" : ["PublicSubnet", "NatSecurityGroup"],
+				"Type": "AWS::EC2::Instance",
+				"DependsOn": "AttachGateway",
+				"Properties": {
+					"ImageId": "ami-dd3dd7cb",
+					"NetworkInterfaces": [
+						{
+							"GroupSet": [
+								{
+									"Ref": "NatSecurityGroup"
+								}
+							],
+							"AssociatePublicIpAddress": "true",
+							"DeviceIndex": "0",
+							"DeleteOnTermination": "true",
+							"SubnetId": {
+								"Ref": "PublicSubnet"
+							}
+						}
+					],
+					"KeyName": "awskeytest",
+					"InstanceType": "t2.micro",
+					"SourceDestCheck": "false",
+					"Tags": [
+						{
+							"Key": "Name",
+							"Value": "natinst"
+						}
+					]
+				}
+		},		
+        "Instance01Public": {
+            "Type": "AWS::EC2::Instance",
+            "DependsOn": "AttachGateway",
+            "Properties": {
+                "ImageId": "ami-1c221e76",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "VolumeType": "standard",
+                            "DeleteOnTermination": "true",
+                            "VolumeSize": "10"
+                        }
+                    }
+                ],
+                "NetworkInterfaces": [
+                    {
+                        "GroupSet": [
+                            {
+                                "Ref": "PublicInstanceSecurityGroup"
+                            }
+                        ],
+                        "AssociatePublicIpAddress": "true",
+                        "DeviceIndex": "0",
+                        "DeleteOnTermination": "true",
+                        "SubnetId": {
+                            "Ref": "PublicSubnet"
+                        }
+                    }
+                ],
+                "KeyName": "awskeytest",
+                "InstanceType": "t2.micro",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "inst01"
+                    }
+                ],
+                "IamInstanceProfile": {
+                    "Ref": "InstanceS3Profile"
+                }
+            }
+        },
+        "Instance02Private": {
+            "Type": "AWS::EC2::Instance",
+            "DependsOn": "AttachGateway",
+            "Properties": {
+                "ImageId": "ami-1c221e76",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "VolumeType": "standard",
+                            "DeleteOnTermination": "true",
+                            "VolumeSize": "10"
+                        }
+                    }
+                ],
+                "NetworkInterfaces": [
+                    {
+                        "GroupSet": [
+                            {
+                                "Ref": "PrivateInstanceSecurityGroup"
+                            }
+                        ],
+                        "DeviceIndex": "0",
+                        "DeleteOnTermination": "true",
+                        "SubnetId": {
+                            "Ref": "PrivateSubnet"
+                        }
+                    }
+                ],
+                "KeyName": "awskeytest",
+                "InstanceType": "t2.micro",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "inst02"
+                    }
+                ],
+                "IamInstanceProfile": {
+                    "Ref": "InstanceS3Profile"
+                }
+            }
+        },
+        "InstRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/"
+            }
+        },
+        "RolePolicies": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyName": "s3policy",
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:ListAllMyBuckets"
+                            ],
+                            "Resource": "arn:aws:s3:::*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:ListBucket",
+                                "s3:GetBucketLocation"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "myS3Bucket"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:PutObject",
+                                "s3:GetObject",
+                                "s3:DeleteObject"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "myS3Bucket"
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "Roles": [
+                    {
+                        "Ref": "InstRole"
+                    }
+                ]
+            }
+        },
+        "InstanceS3Profile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "InstRole"
+                    }
+                ]
+            }
+        },
+        "ElasticIP01": {
+            "Type": "AWS::EC2::EIP",
+            "DependsOn": "AttachGateway",
+            "Properties": {
+                "InstanceId": {
+                    "Ref": "Instance01Public"
+                }
+            }
+        },
+		"ElasticIPNat": {
+			"Type": "AWS::EC2::EIP",
+			"DependsOn": "AttachGateway",
+			"Properties": {
+				"InstanceId": {
+					"Ref": "NatInstance"
+				}
+			}
+		},
+		"PrivateRoute" : {
+		  "DependsOn" : ["PrivateRouteTable", "NatInstance"],
+		  "Type" : "AWS::EC2::Route",
+		  "Properties" : {
+			"RouteTableId" : { "Ref" : "PrivateRouteTable" },
+			"DestinationCidrBlock" : "0.0.0.0/0",
+			"InstanceId" : { "Ref" : "NatInstance" }
+		  }
+		}
+	}	
+}
