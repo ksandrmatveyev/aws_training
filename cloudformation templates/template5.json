@@ -1,0 +1,396 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS Task1",
+    "Resources": {
+	
+        "myVPC": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": "10.0.0.0/16",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": {
+                            "Ref": "AWS::StackId"
+                        }
+                    }
+                ]
+            }
+        },
+		
+        "PublicSubnet01": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "myVPC"
+                },
+                "CidrBlock": "10.0.0.0/24",
+                "AvailabilityZone": "us-east-1a",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": {
+                            "Ref": "AWS::StackId"
+                        }
+                    }
+                ]
+            }
+        },
+		
+        "PublicSubnet02": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "myVPC"
+                },
+                "CidrBlock": "10.0.1.0/24",
+                "AvailabilityZone": "us-east-1b",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": {
+                            "Ref": "AWS::StackId"
+                        }
+                    }
+                ]
+            }
+        },
+		
+        "PublicSubnet03": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "myVPC"
+                },
+                "CidrBlock": "10.0.2.0/24",
+                "AvailabilityZone": "us-east-1c",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": {
+                            "Ref": "AWS::StackId"
+                        }
+                    }
+                ]
+            }
+        },
+		
+        "InternetGateway": {
+            "Type": "AWS::EC2::InternetGateway",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": {
+                            "Ref": "AWS::StackId"
+                        }
+                    }
+                ]
+            }
+        },
+		
+        "AttachGateway": {
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "myVPC"
+                },
+                "InternetGatewayId": {
+                    "Ref": "InternetGateway"
+                }
+            }
+        },
+		
+        "RouteTable": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "myVPC"
+                },
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": {
+                            "Ref": "AWS::StackId"
+                        }
+                    }
+                ]
+            }
+        },
+		
+        "Route": {
+            "Type": "AWS::EC2::Route",
+            "DependsOn": "AttachGateway",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "RouteTable"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "InternetGateway"
+                }
+            }
+        },
+		
+        "SubnetRouteTableAssociation01": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "PublicSubnet01"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTable"
+                }
+            }
+        },
+		
+        "SubnetRouteTableAssociation02": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "PublicSubnet02"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTable"
+                }
+            }
+        },
+		
+        "SubnetRouteTableAssociation03": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "PublicSubnet03"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteTable"
+                }
+            }
+        },
+		
+        "myS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+			"Properties" : {
+            "AccessControl" : "PublicRead"
+            }
+        },
+		
+        "InstRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/"
+            }
+        },
+		
+        "RolePolicies": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyName": "s3policy",
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:ListAllMyBuckets"
+                            ],
+                            "Resource": "arn:aws:s3:::*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:ListBucket",
+                                "s3:GetBucketLocation"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "myS3Bucket"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:PutObject",
+                                "s3:GetObject",
+                                "s3:DeleteObject"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "myS3Bucket"
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "Roles": [
+                    {
+                        "Ref": "InstRole"
+                    }
+                ]
+            }
+        },
+
+        "InstanceS3Profile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "InstRole"
+                    }
+                ]
+            }
+        },
+
+        "InstanceSG": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "myVPC"
+                },
+                "GroupDescription": "AWS Task1 Security Group",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "SourceSecurityGroupId" : { "Ref" : "LoadBalancerSG" }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },
+		
+		"LoadBalancerSG" : {
+		  "Type" : "AWS::EC2::SecurityGroup",
+		  "Properties" : {
+			"GroupDescription" : "Public ELB Security Group with HTTP access on port 80 from the internet",
+			"VpcId" : { "Ref" : "myVPC" },
+			"SecurityGroupIngress" : [ { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"} ],
+			"SecurityGroupEgress" : [ { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"} ]
+		  }
+		},		
+		
+		"ElasticLoadBalancer" : {
+		  "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+		  "Properties" : {
+            "Subnets" : [ { "Ref" : "PublicSubnet01" },{ "Ref" : "PublicSubnet02" },{ "Ref" : "PublicSubnet03" } ],
+			"SecurityGroups" : [ { "Ref" : "LoadBalancerSG" } ],
+			"CrossZone" : "true",
+			"Listeners" : [ {
+			  "LoadBalancerPort" : "80",
+			  "InstancePort" : "80",
+			  "Protocol" : "HTTP"
+			} ],
+			"HealthCheck" : {
+			  "Target" : "HTTP:80/",
+			  "HealthyThreshold" : "3",
+			  "UnhealthyThreshold" : "5",
+			  "Interval" : "30",
+			  "Timeout" : "5"
+			}
+		  }
+		},
+		
+		"NginxAutoScalingGroup" : {
+		  "Type" : "AWS::AutoScaling::AutoScalingGroup",
+		  "DependsOn" : "InternetGateway",
+		  "Properties" : {
+			"AvailabilityZones" : [
+				{ "Fn::GetAtt" : [ "PublicSubnet01", "AvailabilityZone" ] },
+				{ "Fn::GetAtt" : [ "PublicSubnet02", "AvailabilityZone" ] },
+				{ "Fn::GetAtt" : [ "PublicSubnet03", "AvailabilityZone" ] }
+			],
+			"VPCZoneIdentifier" : [
+			    { "Ref" : "PublicSubnet01" },
+				{ "Ref" : "PublicSubnet02" },
+				{ "Ref" : "PublicSubnet03" }
+			],
+			"LaunchConfigurationName" : { "Ref" : "LaunchConfig" },
+			"MinSize" : "2",
+			"MaxSize" : "2",
+			"DesiredCapacity" : "2",
+			"LoadBalancerNames" : [ { "Ref" : "ElasticLoadBalancer" } ]
+		  }
+		},
+
+		"LaunchConfig" : {
+		  "Type" : "AWS::AutoScaling::LaunchConfiguration",
+		  "Properties" : {
+			"ImageId" : "ami-1c221e76",
+			"AssociatePublicIpAddress" : "True",
+			"KeyName" : "awskeytest",
+			"SecurityGroups" : [ { "Ref" : "InstanceSG" } ],
+			"InstanceType" : "t2.micro",
+			"UserData" : { "Fn::Base64" : 
+				{ "Fn::Join" : ["", [
+						"#!/bin/bash\n", "\n",
+						"yum install -y epel-release\n",
+						"yum install -y nginx\n",
+						"service nginx start\n",
+						"chkconfig nginx on\n",
+						"iptables -I INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT\n",
+						"iptables -I INPUT -p tcp --dport 80 -m state --state NEW -j ACCEPT\n",
+						"iptables -I INPUT -p tcp --dport 443 -m state --state NEW -j ACCEPT\n",
+						"service iptables save\n",
+						"service iptables restart\n"
+						]
+					] 
+				}
+			},
+			"BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "VolumeType": "standard",
+                            "DeleteOnTermination": "true",
+                            "VolumeSize": "10"
+                        }
+                    }
+            ],
+			"IamInstanceProfile": {
+                    "Ref": "InstanceS3Profile"
+            }
+		  }	
+		}
+    }
+}
