@@ -55,15 +55,22 @@
 
 <hr>
 <b>Check how S3 works from instances</b>
-install awscli #on instance
-ec2instance$ aws s3 ls
-ec2instance$ aws s3 sync s3://<path_to_file> .
+install awscli #on instance<br>
+ec2instance$ aws s3 ls<br>
+ec2instance$ aws s3 sync s3://<path_to_file> . <br>
 
 <hr>
 <b>Check how NAT works</b>
- local_machine$ ssh -i awskeytest.pem ec2-user@nat_instance
- nat_instance$ create awskeytest.pem
- nat_instance$ ping google.by #test ping -1 route in nat instance security group
- private_instance$ ssh -i awskeytest.pem centos@private_instance
- private_instance$ ping google.by  #test ping -1 route in private instance security group
- private_instance$ curl ipinfo.io/ip # check, if get nat instance public ip, mean works
+ local_machine$ ssh -i awskeytest.pem ec2-user@nat_instance<br>
+ nat_instance$ create awskeytest.pem<br>
+ nat_instance$ ping google.by #test ping -1 route in nat instance security group<br>
+ private_instance$ ssh -i awskeytest.pem centos@private_instance<br>
+ private_instance$ ping google.by  #test ping -1 route in private instance security group<br>
+ private_instance$ curl ipinfo.io/ip # check, if get nat instance public ip, mean works<br>
+ 
+ <hr>
+ <b>Issues</b>
+ I1. An error occurred (InsufficientCapabilitiesException) when calling the CreateStack operation: Requires capabilities : [CAPABILITY_IAM]<br>
+ S1. use --capabilities CAPABILITY_IAM flag with aws cloudformation clis<br>
+ I2. Can't attach new root volumes<br>
+ S2. use "BlockDeviceMappings" or manually: stop instance->deattach old volume->attach new
