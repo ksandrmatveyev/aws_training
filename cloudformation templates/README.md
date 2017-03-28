@@ -54,13 +54,13 @@
 12) Launch Configuration with installing NGINX, opening ports on firewall, custom root EBS volumes and Instance Profile for access to s3 bucket
 
 <hr>
-<b>Check how S3 works from instances</b>
+<b>Check how S3 works from instances</b><br>
 install awscli #on instance<br>
 ec2instance$ aws s3 ls<br>
 ec2instance$ aws s3 sync s3://<path_to_file> . <br>
 
 <hr>
-<b>Check how NAT works</b>
+<b>Check how NAT works</b><br>
  local_machine$ ssh -i awskeytest.pem ec2-user@nat_instance<br>
  nat_instance$ create awskeytest.pem<br>
  nat_instance$ ping google.by #test ping -1 route in nat instance security group<br>
@@ -69,7 +69,7 @@ ec2instance$ aws s3 sync s3://<path_to_file> . <br>
  private_instance$ curl ipinfo.io/ip # check, if get nat instance public ip, mean works<br>
  
  <hr>
- <b>Issues</b>
+ <b>Issues</b><br>
  I1. An error occurred (InsufficientCapabilitiesException) when calling the CreateStack operation: Requires capabilities : [CAPABILITY_IAM]<br>
  S1. use --capabilities CAPABILITY_IAM flag with aws cloudformation clis<br>
  I2. Can't attach new root volumes<br>
