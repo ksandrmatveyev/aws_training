@@ -1,3 +1,6 @@
+# Template1.json
+Hardcoded private IPs
+
 # Issues<br>
 1) Unable to resolve host .....<br>
 a. We must add to /etc/hosts: <br>
