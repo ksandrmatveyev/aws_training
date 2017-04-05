@@ -259,7 +259,7 @@
 				"apt-get update -y\n",
 				"apt-get install salt-minion -y\n",
 				"sed -i 's/#master: salt/master: 10.0.0.10/' /etc/salt/minion\n",
-				"service salt-minion restart"
+				"service salt-minion restart\n"
               ]
             ]
           }
@@ -299,7 +299,7 @@
 				"apt-get update -y\n",
 				"apt-get install salt-minion -y\n",
 				"sed -i 's/#master: salt/master: 10.0.0.10/' /etc/salt/minion\n",
-				"service salt-minion restart"
+				"service salt-minion restart\n"
               ]
             ]
           }
