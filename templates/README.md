@@ -1,5 +1,12 @@
-# Template1.json
-Hardcoded private IPs
+# Template1.json<br>
+Hardcoded private IPs<br>
+
+# Template2.json<br>
+Private IPs, minion ids as parameters<br>
+Access to s3 bucket from all instances for getting keypairs:<br>
+ downloading minion.pub for salt-master (change name for every minion)
+ downloading minion.pub and minion.pem for minions
+Note: Key pairs are the same for every minion
 
 # Issues<br>
 1) Unable to resolve host .....<br>
