@@ -4,6 +4,11 @@ install-apache:
 check-apache-service:
   service.running:
     - name: apache2
+    - enable: True
+    - reload: True
+    - watch:
+      - apache: /etc/apache2/sites-available/static-host.conf
+      - file: create-apps-host
     - require:
       - pkg: install-apache
 enable-proxy-module:
@@ -39,15 +44,10 @@ copy-all-from-s3content:
 create-apps-host:
   file.managed:
     - name: /etc/apache2/sites-available/apps-host.conf
-    - contents: |
-        <VirtualHost *:80>
-        ProxyRequests off
-        ProxyPreserveHost On
-        ProxyPass /app1 http://{{ pillar['app1IP'] }}:8080/{{ pillar['war-name'] }} retry=0 timeout=5
-        ProxyPassReverse /app1 http://{{ pillar['app1IP'] }}:8080/{{ pillar['war-name'] }}
-        ProxyPass /app2 http://{{ pillar['app2IP'] }}:8080/{{ pillar['war-name'] }} retry=0 timeout=5
-        ProxyPassReverse /app2 http://{{ pillar['app2IP'] }}:8080/{{ pillar['war-name'] }}
-        </VirtualHost>
+    - source: salt://webserver/apps-vhost.conf.jinja
+    - template: jinja
+    - require:
+        - apache: /etc/apache2/sites-available/static-host.conf
 enable-static-host:
   apache_site.enabled:
     - name: static-host

@@ -7,7 +7,7 @@
 3) Attached Internet Gateway, Route Table with Route to this gateway, Association of Subnet with Route Table<br>
 4) Public Security Group, which allow 80(apache),8080(tomcats),443(for salt install),22(ssh),4505-4506 (salt-master/minion ports),ping (for testing)<br>
 5) Instance Profile for acccess to "deployment" bucket with WARs,Salt States, Salt Key Pairs<br>
-6) Instance Profile for access to "content" bucket with static content for apache and to "deployment" bucket<br>
+6) Instance Profile for access to "content" bucket with static content for apache<br>
 
 <b>Note</b>: Can't use several instance profiles with one instance or several instance roles with one instance profile (<a href='http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html#w1ab2c19c12d512c13' target=_blank>for now</a>)<br>
 

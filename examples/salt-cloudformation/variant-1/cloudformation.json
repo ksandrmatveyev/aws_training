@@ -613,8 +613,7 @@
 				"sed -i 's/#id:/id: ",{ "Ref" : "App1MinionId" }, "/' /etc/salt/minion\n",
 				"echo 'roles: appserver1' > /etc/salt/grains\n",
 				"aws s3 sync s3://",{ "Ref" : "s3bucketDeployment" },"/keys/minions/ /etc/salt/pki/minion/\n",
-				"service salt-minion start\n",
-        "aws s3 sync s3://",{ "Ref" : "s3bucketDeployment" },"/war/1.0.0/ /home/ubuntu/\n"
+				"service salt-minion start\n"
               ]
             ]
           }
@@ -662,8 +661,7 @@
 				"sed -i 's/#id:/id: ",{ "Ref" : "App2MinionId" }, "/' /etc/salt/minion\n",
 				"echo 'roles: appserver2' > /etc/salt/grains\n",
 				"aws s3 sync s3://",{ "Ref" : "s3bucketDeployment" },"/keys/minions/ /etc/salt/pki/minion/\n",
-				"service salt-minion start\n",
-        "aws s3 sync s3://",{ "Ref" : "s3bucketDeployment" },"/war/1.0.1/ /home/ubuntu/\n"
+				"service salt-minion start\n"
               ]
             ]
           }

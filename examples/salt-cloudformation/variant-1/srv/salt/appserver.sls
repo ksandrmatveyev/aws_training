@@ -33,12 +33,19 @@ add-tomcat-user:
         <user username="{{ pillar['tomcat-manager']['user'] }}" password="{{ pillar['tomcat-manager']['passwd'] }}" roles="manager-script"/>
     - backup: '.bak'
     - show_changes: True
+elete-war-if-exists:
+  file.absent:
+    - name: /home/ubuntu/{{ pillar['war-name'] }}.war
+copy-from-s3deploy:
+  cmd.run:
+    - name: 'aws s3 cp s3://{{ pillar['s3bucketdeployment'] }}/war/{{ pillar['war-version'] }}/{{ pillar['war-name'] }}.war /home/ubuntu/'
 deploy-war:
   tomcat.war_deployed:
     - name: /{{ pillar['war-name'] }}
     - war: '/home/ubuntu/{{ pillar['war-name'] }}.war'
     - timeout: 300
     - require:
+      - cmd: copy-from-s3deploy
       - service: check-tomcat-service
 change-file:
   file.replace:

@@ -1,178 +1,167 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "AWS Task2",
-  "Parameters" : {
-	  "PrivateIPSaltMaster" : {
-		"Type" : "String",
-		"Default" : "10.0.0.10",
-		"Description" : "Enter private IP for salt master. Default is 10.0.0.10"
-	  },
-	  "PrivateIPSaltMinion1" : {
-		"Type" : "String",
-		"Default" : "10.0.0.11",
-		"Description" : "Enter private IP for salt minion. Default is 10.0.0.11"
-	  },
-	  "PrivateIPSaltMinion2" : {
-		"Type" : "String",
-		"Default" : "10.0.0.12",
-		"Description" : "Enter private IP for salt minion. Default is 10.0.0.12"
-	  },
-	  "PrivateIPSaltMinion3" : {
-		"Type" : "String",
-		"Default" : "10.0.0.13",
-		"Description" : "Enter private IP for salt minion. Default is 10.0.0.13"
-	  },
-	  "s3bucketDeployment" : {
-		"Type" : "String",
-		"Default" : "manual-private-bucket",
-		"Description" : "Name of deployment s3bucket. Default is manual-private-bucket"
-	  },
-	  "s3bucketContent" : {
-		"Type" : "String",
-		"Default" : "content-private-bucket",
-		"Description" : "Name of content s3bucket. Default is static-private-bucket"
-	  },
-	  "PrivateIPSaltMinion3" : {
-		"Type" : "String",
-		"Default" : "10.0.0.13",
-		"Description" : "Enter private IP for salt minion. Default is 10.0.0.13"
-	  },
-	  "Web1MinionId" : {
-		"Type" : "String",
-		"Default" : "web1-minion",
-		"Description" : "Id for minion with application. Default web1-minion"
-	  },
-	  "App1MinionId" : {
-		"Type" : "String",
-		"Default" : "app1-minion",
-		"Description" : "Id for minion with application. Default app1-minion"
-	  },
-	  "App2MinionId" : {
-		"Type" : "String",
-		"Default" : "app2-minion",
-		"Description" : "Id for minion with application. Default app2-minion"
-	  }
+  "Parameters": {
+    "PrivateIPSaltMaster": {
+      "Type": "String",
+      "Default": "10.0.0.10",
+      "Description": "Enter private IP for salt master. Default is 10.0.0.10"
+    },
+    "PrivateIPSaltMinion1": {
+      "Type": "String",
+      "Default": "10.0.0.11",
+      "Description": "Enter private IP for salt minion. Default is 10.0.0.11"
+    },
+    "PrivateIPSaltMinion2": {
+      "Type": "String",
+      "Default": "10.0.0.12",
+      "Description": "Enter private IP for salt minion. Default is 10.0.0.12"
+    },
+    "PrivateIPSaltMinion3": {
+      "Type": "String",
+      "Default": "10.0.0.13",
+      "Description": "Enter private IP for salt minion. Default is 10.0.0.13"
+    },
+    "s3bucketDeployment": {
+      "Type": "String",
+      "Default": "manual-private-bucket",
+      "Description": "Name of deployment s3bucket. Default is manual-private-bucket"
+    },
+    "s3bucketContent": {
+      "Type": "String",
+      "Default": "content-private-bucket",
+      "Description": "Name of content s3bucket. Default is static-private-bucket"
+    },
+    "Web1MinionId": {
+      "Type": "String",
+      "Default": "web1-minion",
+      "Description": "Id for minion with application. Default web1-minion"
+    },
+    "App1MinionId": {
+      "Type": "String",
+      "Default": "app1-minion",
+      "Description": "Id for minion with application. Default app1-minion"
+    },
+    "App2MinionId": {
+      "Type": "String",
+      "Default": "app2-minion",
+      "Description": "Id for minion with application. Default app2-minion"
+    }
   },
   "Resources": {
-        "myVPC": {
-            "Type": "AWS::EC2::VPC",
-            "Properties": {
-                "CidrBlock": "10.0.0.0/16",
-				"EnableDnsSupport" : "true",
-				"EnableDnsHostnames" : "true",
-                "Tags": [
-                    {
-                        "Key": "Application",
-                        "Value": {
-                            "Ref": "AWS::StackId"
-                        }
-                    }
-                ]
+    "myVPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": {
+              "Ref": "AWS::StackId"
             }
+          }
+        ]
+      }
+    },
+    "PublicSubnet01": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "myVPC"
         },
-
-        "PublicSubnet01": {
-            "Type": "AWS::EC2::Subnet",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "myVPC"
-                },
-                "CidrBlock": "10.0.0.0/24",
-                "AvailabilityZone": "us-east-1a",
-                "Tags": [
-                    {
-                        "Key": "Application",
-                        "Value": {
-                            "Ref": "AWS::StackId"
-                        }
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    }
-                ]
+        "CidrBlock": "10.0.0.0/24",
+        "AvailabilityZone": "us-east-1a",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": {
+              "Ref": "AWS::StackId"
             }
-        },
-		"InternetGateway": {
-            "Type": "AWS::EC2::InternetGateway",
-            "Properties": {
-                "Tags": [
-                    {
-                        "Key": "Application",
-                        "Value": {
-                            "Ref": "AWS::StackId"
-                        }
-                    }
-                ]
+          },
+          {
+            "Key": "Network",
+            "Value": "Public"
+          }
+        ]
+      }
+    },
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": {
+              "Ref": "AWS::StackId"
             }
+          }
+        ]
+      }
+    },
+    "AttachInternetGateway": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "myVPC"
         },
-
-        "AttachInternetGateway": {
-            "Type": "AWS::EC2::VPCGatewayAttachment",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "myVPC"
-                },
-                "InternetGatewayId": {
-                    "Ref": "InternetGateway"
-                }
+        "InternetGatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "PublicRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "myVPC"
+        },
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": {
+              "Ref": "AWS::StackId"
             }
+          },
+          {
+            "Key": "Network",
+            "Value": "Public"
+          }
+        ]
+      }
+    },
+    "PublicRoute": {
+      "Type": "AWS::EC2::Route",
+      "DependsOn": "AttachInternetGateway",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
         },
-
-        "PublicRouteTable": {
-            "Type": "AWS::EC2::RouteTable",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "myVPC"
-                },
-                "Tags": [
-                    {
-                        "Key": "Application",
-                        "Value": {
-                            "Ref": "AWS::StackId"
-                        }
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    }
-                ]
-            }
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "PublicSubnetRouteTableAssociation01": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet01"
         },
-
-        "PublicRoute": {
-            "Type": "AWS::EC2::Route",
-            "DependsOn": "AttachInternetGateway",
-            "Properties": {
-                "RouteTableId": {
-                    "Ref": "PublicRouteTable"
-                },
-                "DestinationCidrBlock": "0.0.0.0/0",
-                "GatewayId": {
-                    "Ref": "InternetGateway"
-                }
-            }
-        },
-
-        "PublicSubnetRouteTableAssociation01": {
-            "Type": "AWS::EC2::SubnetRouteTableAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "PublicSubnet01"
-                },
-                "RouteTableId": {
-                    "Ref": "PublicRouteTable"
-                }
-            }
-        },
-
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
     "PublicSG": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "GroupDescription": "public Security Group",
-		"VpcId": {
-	      "Ref": "myVPC"
-	    },
+        "VpcId": {
+          "Ref": "myVPC"
+        },
         "SecurityGroupIngress": [
           {
             "IpProtocol": "tcp",
@@ -186,38 +175,38 @@
             "ToPort": "8080",
             "CidrIp": "0.0.0.0/0"
           },
-		  {
+          {
             "IpProtocol": "tcp",
             "FromPort": "443",
             "ToPort": "443",
             "CidrIp": "0.0.0.0/0"
           },
-		  {
+          {
             "IpProtocol": "tcp",
             "FromPort": "22",
             "ToPort": "22",
             "CidrIp": "0.0.0.0/0"
           },
-		  {
+          {
             "IpProtocol": "tcp",
             "FromPort": "4505",
             "ToPort": "4505",
             "CidrIp": "0.0.0.0/0"
           },
-		  {
+          {
             "IpProtocol": "tcp",
             "FromPort": "4506",
             "ToPort": "4506",
             "CidrIp": "0.0.0.0/0"
           },
           {
-                "IpProtocol": "icmp",
-                "FromPort": "-1",
-                "ToPort": "-1",
-                "CidrIp": "0.0.0.0/0"
-              }
+            "IpProtocol": "icmp",
+            "FromPort": "-1",
+            "ToPort": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
         ],
-		  "SecurityGroupEgress": [
+        "SecurityGroupEgress": [
           {
             "IpProtocol": "tcp",
             "FromPort": "80",
@@ -230,274 +219,277 @@
             "ToPort": "8080",
             "CidrIp": "0.0.0.0/0"
           },
-		  {
+          {
             "IpProtocol": "tcp",
             "FromPort": "443",
             "ToPort": "443",
             "CidrIp": "0.0.0.0/0"
           },
-		  {
+          {
             "IpProtocol": "tcp",
             "FromPort": "22",
             "ToPort": "22",
             "CidrIp": "0.0.0.0/0"
           },
-		  {
+          {
             "IpProtocol": "tcp",
             "FromPort": "4505",
             "ToPort": "4505",
             "CidrIp": "0.0.0.0/0"
           },
-		  {
+          {
             "IpProtocol": "tcp",
             "FromPort": "4506",
             "ToPort": "4506",
             "CidrIp": "0.0.0.0/0"
           },
           {
-                          "IpProtocol": "icmp",
-                          "FromPort": "-1",
-                          "ToPort": "-1",
-                          "CidrIp": "0.0.0.0/0"
-                        }
-
+            "IpProtocol": "icmp",
+            "FromPort": "-1",
+            "ToPort": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
         ]
       }
     },
-	"InstRoleDeploy": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    "ec2.amazonaws.com"
-                                ]
-                            },
-                            "Action": [
-                                "sts:AssumeRole"
-                            ]
-                        }
-                    ]
-                },
-                "Path": "/"
+    "InstRoleDeploy": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
             }
+          ]
+        },
+        "Path": "/"
+      }
     },
-
-	"RolePoliciesDeploy": {
-		"Type": "AWS::IAM::Policy",
-		"Properties": {
-			"PolicyName": "s3policy",
-			"PolicyDocument": {
-				"Version": "2012-10-17",
-				"Statement": [
-					{
-						"Effect": "Allow",
-						"Action": [
-							"s3:ListAllMyBuckets"
-						],
-						"Resource": "arn:aws:s3:::*"
-					},
-					{
-						"Effect": "Allow",
-						"Action": [
-							"s3:ListBucket",
-							"s3:GetBucketLocation"
-						],
-						"Resource": [
-							{
-								"Fn::Join": [
-									"",
-									[
-										"arn:aws:s3:::",
-										{ "Ref" : "s3bucketDeployment" }
-									]
-								]
-							}
-						]
-					},
-					{
-						"Effect": "Allow",
-						"Action": [
-							"s3:PutObject",
-							"s3:GetObject",
-							"s3:DeleteObject"
-						],
-						"Resource": [
-							{
-								"Fn::Join": [
-									"",
-									[
-										"arn:aws:s3:::",
-										{ "Ref" : "s3bucketDeployment" },
-										"/*"
-									]
-								]
-							}
-						]
-					}
-				]
-			},
-			"Roles": [
-				{
-					"Ref": "InstRoleDeploy"
-				}
-			]
-		}
-	},
-	"InstanceS3DeployProfile": {
-		"Type": "AWS::IAM::InstanceProfile",
-		"Properties": {
-			"Path": "/",
-			"Roles": [
-				{
-					"Ref": "InstRoleDeploy"
-				}
-			]
-		}
-	},
-		"InstRoleContent": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    "ec2.amazonaws.com"
-                                ]
-                            },
-                            "Action": [
-                                "sts:AssumeRole"
-                            ]
-                        }
+    "RolePoliciesDeploy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "s3deploypolicy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:ListAllMyBuckets"
+              ],
+              "Resource": "arn:aws:s3:::*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "s3bucketDeployment"
+                      }
                     ]
-                },
-                "Path": "/"
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "s3bucketDeployment"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
             }
-    },
-
-	"RolePoliciesContent": {
-		"Type": "AWS::IAM::Policy",
-		"Properties": {
-			"PolicyName": "s3policy",
-			"PolicyDocument": {
-				"Version": "2012-10-17",
-				"Statement": [
+          ]
+        },
+        "Roles": [
           {
-            "Effect": "Allow",
-            "Action": [
-              "s3:ListAllMyBuckets"
-            ],
-            "Resource": "arn:aws:s3:::*"
+            "Ref": "InstRoleDeploy"
           },
-					{
-						"Effect": "Allow",
-						"Action": [
-							"s3:ListBucket",
-							"s3:GetBucketLocation"
-						],
-						"Resource": [
-              {
-								"Fn::Join": [
-									"",
-									[
-										"arn:aws:s3:::",
-										{ "Ref" : "s3bucketDeployment" }
-									]
-								]
-							},
-              {
-								"Fn::Join": [
-									"",
-									[
-										"arn:aws:s3:::",
-										{ "Ref" : "s3bucketContent" }
-									]
-								]
-							}
-						]
-					},
-					{
-						"Effect": "Allow",
-						"Action": [
-							"s3:PutObject",
-							"s3:GetObject",
-							"s3:DeleteObject"
-						],
-						"Resource": [
-              {
-								"Fn::Join": [
-									"",
-									[
-										"arn:aws:s3:::",
-										{ "Ref" : "s3bucketDeployment" },
-                    "/*"
-									]
-								]
-							},
-              {
-								"Fn::Join": [
-									"",
-									[
-										"arn:aws:s3:::",
-										{ "Ref" : "s3bucketContent" },
-										"/*"
-									]
-								]
-							}
-						]
-					}
-				]
-			},
-			"Roles": [
-				{
-					"Ref": "InstRoleContent"
-				}
-			]
-		}
-	},
-	"InstanceS3ContentProfile": {
-		"Type": "AWS::IAM::InstanceProfile",
-		"Properties": {
-			"Path": "/",
-			"Roles": [
-				{
-					"Ref": "InstRoleContent"
-				}
-			]
-		}
-	},
+          {
+            "Ref": "InstRoleContent"
+          }
+        ]
+      }
+    },
+    "InstanceS3DeployProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "InstRoleDeploy"
+          }
+        ]
+      }
+    },
+    "InstRoleContent": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/"
+      }
+    },
+    "RolePoliciesContent": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "s3contentpolicy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:ListAllMyBuckets"
+              ],
+              "Resource": "arn:aws:s3:::*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "s3bucketContent"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "s3bucketContent"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "InstRoleContent"
+          }
+        ]
+      }
+    },
+    "InstanceS3ContentProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "InstRoleContent"
+          }
+        ]
+      }
+    },
     "SaltMaster": {
       "Type": "AWS::EC2::Instance",
-      "DependsOn": ["PublicSG","WebMinion01","AppMinion01","AppMinion02"],
+      "DependsOn": [
+        "PublicSG",
+        "WebMinion01",
+        "AppMinion01",
+        "AppMinion02"
+      ],
       "Properties": {
         "ImageId": "ami-49c9295f",
         "KeyName": "awskeytest",
         "InstanceType": "t2.micro",
-        "NetworkInterfaces" : [{
-          "GroupSet"                 : [{ "Ref" : "PublicSG" }],
-          "AssociatePublicIpAddress" : "true",
-          "DeviceIndex"              : "0",
-          "DeleteOnTermination"      : "true",
-          "SubnetId"                 : { "Ref" : "PublicSubnet01" },
-		  "PrivateIpAddress" : { "Ref" : "PrivateIPSaltMaster" }
-        }],
+        "NetworkInterfaces": [
+          {
+            "GroupSet": [
+              {
+                "Ref": "PublicSG"
+              }
+            ],
+            "AssociatePublicIpAddress": "true",
+            "DeviceIndex": "0",
+            "DeleteOnTermination": "true",
+            "SubnetId": {
+              "Ref": "PublicSubnet01"
+            },
+            "PrivateIpAddress": {
+              "Ref": "PrivateIPSaltMaster"
+            }
+          }
+        ],
         "Tags": [
           {
             "Key": "Name",
             "Value": "MASTER"
           }
         ],
-		"IamInstanceProfile": {
-			"Ref": "InstanceS3DeployProfile"
-		},
-
+        "IamInstanceProfile": {
+          "Ref": "InstanceS3DeployProfile"
+        },
         "UserData": {
           "Fn::Base64": {
             "Fn::Join": [
@@ -505,48 +497,86 @@
               [
                 "#!/bin/bash\n",
                 "\n",
-				"curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install awscli\n",
+                "curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install awscli\n",
                 "wget -O - https://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add -\n",
-				"echo 'deb http://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest trusty main' > /etc/apt/sources.list.d/saltstack.list\n",
-				"apt-get update -y\n",
-				"apt-get install salt-master -y\n",
-				"service salt-master stop\n",
-				"aws s3 cp s3://",{ "Ref" : "s3bucketDeployment" },"/keys/minions/minion.pub /etc/salt/pki/master/minions/",{ "Ref" : "Web1MinionId" },"\n",
-				"aws s3 cp s3://",{ "Ref" : "s3bucketDeployment" },"/keys/minions/minion.pub /etc/salt/pki/master/minions/",{ "Ref" : "App1MinionId" },"\n",
-				"aws s3 cp s3://",{ "Ref" : "s3bucketDeployment" },"/keys/minions/minion.pub /etc/salt/pki/master/minions/",{ "Ref" : "App2MinionId" },"\n",
-				"aws s3 sync s3://",{ "Ref" : "s3bucketDeployment" },"/srv/ /srv/","\n",
-				"service salt-master start\n"
+                "echo 'deb http://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest trusty main' > /etc/apt/sources.list.d/saltstack.list\n",
+                "apt-get update -y\n",
+                "apt-get install salt-master -y\n",
+                "service salt-master stop\n",
+                "aws s3 cp s3://",
+                {
+                  "Ref": "s3bucketDeployment"
+                },
+                "/keys/minions/minion.pub /etc/salt/pki/master/minions/",
+                {
+                  "Ref": "Web1MinionId"
+                },
+                "\n",
+                "aws s3 cp s3://",
+                {
+                  "Ref": "s3bucketDeployment"
+                },
+                "/keys/minions/minion.pub /etc/salt/pki/master/minions/",
+                {
+                  "Ref": "App1MinionId"
+                },
+                "\n",
+                "aws s3 cp s3://",
+                {
+                  "Ref": "s3bucketDeployment"
+                },
+                "/keys/minions/minion.pub /etc/salt/pki/master/minions/",
+                {
+                  "Ref": "App2MinionId"
+                },
+                "\n",
+                "aws s3 sync s3://",
+                {
+                  "Ref": "s3bucketDeployment"
+                },
+                "/srv2/ /srv/",
+                "\n",
+                "service salt-master start\n"
               ]
             ]
           }
         }
       }
     },
-	"WebMinion01": {
+    "WebMinion01": {
       "Type": "AWS::EC2::Instance",
       "DependsOn": "PublicSG",
       "Properties": {
         "ImageId": "ami-49c9295f",
         "KeyName": "awskeytest",
         "InstanceType": "t2.micro",
-        "NetworkInterfaces" : [{
-          "GroupSet"                 : [{ "Ref" : "PublicSG" }],
-          "AssociatePublicIpAddress" : "true",
-          "DeviceIndex"              : "0",
-          "DeleteOnTermination"      : "true",
-          "SubnetId"                 : { "Ref" : "PublicSubnet01" },
-		  "PrivateIpAddress" : { "Ref" : "PrivateIPSaltMinion1" }
-        }],
+        "NetworkInterfaces": [
+          {
+            "GroupSet": [
+              {
+                "Ref": "PublicSG"
+              }
+            ],
+            "AssociatePublicIpAddress": "true",
+            "DeviceIndex": "0",
+            "DeleteOnTermination": "true",
+            "SubnetId": {
+              "Ref": "PublicSubnet01"
+            },
+            "PrivateIpAddress": {
+              "Ref": "PrivateIPSaltMinion1"
+            }
+          }
+        ],
         "Tags": [
           {
             "Key": "Name",
             "Value": "WEB"
           }
         ],
-		"IamInstanceProfile": {
-			"Ref": "InstanceS3ContentProfile"
-		},
-
+        "IamInstanceProfile": {
+          "Ref": "InstanceS3ContentProfile"
+        },
         "UserData": {
           "Fn::Base64": {
             "Fn::Join": [
@@ -554,17 +584,29 @@
               [
                 "#!/bin/bash\n",
                 "\n",
-				"curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install awscli\n",
-				"wget -O - https://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add -\n",
-				"echo 'deb http://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest trusty main' > /etc/apt/sources.list.d/saltstack.list\n",
-				"apt-get update -y\n",
-				"apt-get install salt-minion -y\n",
-				"service salt-minion stop\n",
-				"sed -i 's/#master: salt/master: ",{ "Ref" : "PrivateIPSaltMaster" }, "/' /etc/salt/minion\n",
-				"sed -i 's/#id:/id: ",{ "Ref" : "Web1MinionId" }, "/' /etc/salt/minion\n",
-				"echo 'roles: webserver' > /etc/salt/grains\n",
-				"aws s3 sync s3://",{ "Ref" : "s3bucketDeployment" },"/keys/minions/ /etc/salt/pki/minion/\n",
-				"service salt-minion start\n"
+                "curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install awscli\n",
+                "wget -O - https://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add -\n",
+                "echo 'deb http://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest trusty main' > /etc/apt/sources.list.d/saltstack.list\n",
+                "apt-get update -y\n",
+                "apt-get install salt-minion -y\n",
+                "service salt-minion stop\n",
+                "sed -i 's/#master: salt/master: ",
+                {
+                  "Ref": "PrivateIPSaltMaster"
+                },
+                "/' /etc/salt/minion\n",
+                "sed -i 's/#id:/id: ",
+                {
+                  "Ref": "Web1MinionId"
+                },
+                "/' /etc/salt/minion\n",
+                "echo 'roles: webserver' > /etc/salt/grains\n",
+                "aws s3 sync s3://",
+                {
+                  "Ref": "s3bucketDeployment"
+                },
+                "/keys/minions/ /etc/salt/pki/minion/\n",
+                "service salt-minion start\n"
               ]
             ]
           }
@@ -578,24 +620,33 @@
         "ImageId": "ami-49c9295f",
         "KeyName": "awskeytest",
         "InstanceType": "t2.micro",
-        "NetworkInterfaces" : [{
-          "GroupSet"                 : [{ "Ref" : "PublicSG" }],
-          "AssociatePublicIpAddress" : "true",
-          "DeviceIndex"              : "0",
-          "DeleteOnTermination"      : "true",
-          "SubnetId"                 : { "Ref" : "PublicSubnet01" },
-		  "PrivateIpAddress" : { "Ref" : "PrivateIPSaltMinion2" }
-        }],
+        "NetworkInterfaces": [
+          {
+            "GroupSet": [
+              {
+                "Ref": "PublicSG"
+              }
+            ],
+            "AssociatePublicIpAddress": "true",
+            "DeviceIndex": "0",
+            "DeleteOnTermination": "true",
+            "SubnetId": {
+              "Ref": "PublicSubnet01"
+            },
+            "PrivateIpAddress": {
+              "Ref": "PrivateIPSaltMinion2"
+            }
+          }
+        ],
         "Tags": [
           {
             "Key": "Name",
             "Value": "APP1"
           }
         ],
-		"IamInstanceProfile": {
-			"Ref": "InstanceS3DeployProfile"
-		},
-
+        "IamInstanceProfile": {
+          "Ref": "InstanceS3DeployProfile"
+        },
         "UserData": {
           "Fn::Base64": {
             "Fn::Join": [
@@ -603,47 +654,69 @@
               [
                 "#!/bin/bash\n",
                 "\n",
-				"curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install awscli\n",
-				"wget -O - https://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add -\n",
-				"echo 'deb http://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest trusty main' > /etc/apt/sources.list.d/saltstack.list\n",
-				"apt-get update -y\n",
-				"apt-get install salt-minion -y\n",
-				"service salt-minion stop\n",
-				"sed -i 's/#master: salt/master: ",{ "Ref" : "PrivateIPSaltMaster" }, "/' /etc/salt/minion\n",
-				"sed -i 's/#id:/id: ",{ "Ref" : "App1MinionId" }, "/' /etc/salt/minion\n",
-				"echo 'roles: appserver1' > /etc/salt/grains\n",
-				"aws s3 sync s3://",{ "Ref" : "s3bucketDeployment" },"/keys/minions/ /etc/salt/pki/minion/\n",
-				"service salt-minion start\n"
+                "curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install awscli\n",
+                "wget -O - https://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add -\n",
+                "echo 'deb http://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest trusty main' > /etc/apt/sources.list.d/saltstack.list\n",
+                "apt-get update -y\n",
+                "apt-get install salt-minion -y\n",
+                "service salt-minion stop\n",
+                "sed -i 's/#master: salt/master: ",
+                {
+                  "Ref": "PrivateIPSaltMaster"
+                },
+                "/' /etc/salt/minion\n",
+                "sed -i 's/#id:/id: ",
+                {
+                  "Ref": "App1MinionId"
+                },
+                "/' /etc/salt/minion\n",
+                "echo 'roles: appserver1' > /etc/salt/grains\n",
+                "aws s3 sync s3://",
+                {
+                  "Ref": "s3bucketDeployment"
+                },
+                "/keys/minions/ /etc/salt/pki/minion/\n",
+                "service salt-minion start\n"
               ]
             ]
           }
         }
       }
     },
-	"AppMinion02": {
+    "AppMinion02": {
       "Type": "AWS::EC2::Instance",
       "DependsOn": "PublicSG",
       "Properties": {
         "ImageId": "ami-49c9295f",
         "KeyName": "awskeytest",
         "InstanceType": "t2.micro",
-        "NetworkInterfaces" : [{
-          "GroupSet"                 : [{ "Ref" : "PublicSG" }],
-          "AssociatePublicIpAddress" : "true",
-          "DeviceIndex"              : "0",
-          "DeleteOnTermination"      : "true",
-          "SubnetId"                 : { "Ref" : "PublicSubnet01" },
-		  "PrivateIpAddress" : { "Ref" : "PrivateIPSaltMinion3" }
-        }],
+        "NetworkInterfaces": [
+          {
+            "GroupSet": [
+              {
+                "Ref": "PublicSG"
+              }
+            ],
+            "AssociatePublicIpAddress": "true",
+            "DeviceIndex": "0",
+            "DeleteOnTermination": "true",
+            "SubnetId": {
+              "Ref": "PublicSubnet01"
+            },
+            "PrivateIpAddress": {
+              "Ref": "PrivateIPSaltMinion3"
+            }
+          }
+        ],
         "Tags": [
           {
             "Key": "Name",
             "Value": "APP2"
           }
         ],
-		"IamInstanceProfile": {
-			"Ref": "InstanceS3DeployProfile"
-		},
+        "IamInstanceProfile": {
+          "Ref": "InstanceS3DeployProfile"
+        },
         "UserData": {
           "Fn::Base64": {
             "Fn::Join": [
@@ -651,17 +724,29 @@
               [
                 "#!/bin/bash\n",
                 "\n",
-				"curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install awscli\n",
-				"wget -O - https://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add -\n",
-				"echo 'deb http://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest trusty main' > /etc/apt/sources.list.d/saltstack.list\n",
-				"apt-get update -y\n",
-				"apt-get install salt-minion -y\n",
-				"service salt-minion stop\n",
-				"sed -i 's/#master: salt/master: ",{ "Ref" : "PrivateIPSaltMaster" }, "/' /etc/salt/minion\n",
-				"sed -i 's/#id:/id: ",{ "Ref" : "App2MinionId" }, "/' /etc/salt/minion\n",
-				"echo 'roles: appserver2' > /etc/salt/grains\n",
-				"aws s3 sync s3://",{ "Ref" : "s3bucketDeployment" },"/keys/minions/ /etc/salt/pki/minion/\n",
-				"service salt-minion start\n"
+                "curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install awscli\n",
+                "wget -O - https://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add -\n",
+                "echo 'deb http://repo.saltstack.com/apt/ubuntu/14.04/amd64/latest trusty main' > /etc/apt/sources.list.d/saltstack.list\n",
+                "apt-get update -y\n",
+                "apt-get install salt-minion -y\n",
+                "service salt-minion stop\n",
+                "sed -i 's/#master: salt/master: ",
+                {
+                  "Ref": "PrivateIPSaltMaster"
+                },
+                "/' /etc/salt/minion\n",
+                "sed -i 's/#id:/id: ",
+                {
+                  "Ref": "App2MinionId"
+                },
+                "/' /etc/salt/minion\n",
+                "echo 'roles: appserver2' > /etc/salt/grains\n",
+                "aws s3 sync s3://",
+                {
+                  "Ref": "s3bucketDeployment"
+                },
+                "/keys/minions/ /etc/salt/pki/minion/\n",
+                "service salt-minion start\n"
               ]
             ]
           }

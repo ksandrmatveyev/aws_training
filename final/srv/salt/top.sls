@@ -1,9 +1,9 @@
 base:
   '*':
-    - common
+    - common.java
   'roles:webserver':
     - match: grain
-    - webserver
+    - webserver.apache
   'roles:appserver*':
     - match: grain
-    - appserver
+    - appserver.tomcat

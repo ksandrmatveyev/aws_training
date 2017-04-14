@@ -4,6 +4,8 @@ install-apache:
 check-apache-service:
   service.running:
     - name: apache2
+    - require:
+      - pkg: install-apache
 enable-proxy-module:
   apache_module.enabled:
     - name: proxy_http
@@ -16,11 +18,11 @@ disable-default-site:
 create-directory:
   file.directory:
     - name: /var/www/static
-copy-from-s3content:
-  file.managed:
-    - name: /var/www/static/1.jpg
-    - source: s3://{{ pillar['s3bucketcontent'] }}/1.jpg
-    - skip_verify: True
+copy-all-from-s3content:
+  cmd.run:
+    - name: 'aws s3 sync s3://{{ pillar['s3bucketcontent'] }} /var/www/static/'
+    - require:
+      - file: create-directory
 /etc/apache2/sites-available/static-host.conf:
   apache.configfile:
     - config:
@@ -35,12 +37,9 @@ copy-from-s3content:
             Order: Deny,Allow
             Allow from: All
 create-apps-host:
-  file.touch:
+  file.managed:
     - name: /etc/apache2/sites-available/apps-host.conf
-append-apps-host:
-  file.append:
-    - name: /etc/apache2/sites-available/apps-host.conf
-    - text: |
+    - contents: |
         <VirtualHost *:80>
         ProxyRequests off
         ProxyPreserveHost On
@@ -49,8 +48,6 @@ append-apps-host:
         ProxyPass /app2 http://{{ pillar['app2IP'] }}:8080/{{ pillar['war-name'] }} retry=0 timeout=5
         ProxyPassReverse /app2 http://{{ pillar['app2IP'] }}:8080/{{ pillar['war-name'] }}
         </VirtualHost>
-    - require:
-        - file: create-apps-host
 enable-static-host:
   apache_site.enabled:
     - name: static-host
@@ -60,7 +57,7 @@ enable-apps-host:
   apache_site.enabled:
     - name: apps-host
     - require:
-        - file: append-apps-host
+        - file: create-apps-host
 restart-apache-service:
   cmd:
     - run
