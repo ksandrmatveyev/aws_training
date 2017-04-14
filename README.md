@@ -1,8 +1,8 @@
-#Final task2<br>
+<b>inal task2</b><br>
 final folder<br>
-#Examples<br>
+<b>Examples</b><br>
 Variants of aws cloudformation templates and salt states<br>
-# Issues<br>
+<b>Issues</b><br>
 1) Unable to resolve host .....<br>
 a. We must add to /etc/hosts: <br>
 127.0.0.1 hostname <br>
