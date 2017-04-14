@@ -11,7 +11,7 @@ Install java<br>
  - dowload content from s3 (used cmd.run because I have no idea how right and simple dowload several files. Because file.managed and s3.get can download only one file. Also I found a bug with s3://-links in last salt version. We can use them only once, next time we get 'hsm' error even if delete file from filesystem)<br>
  - create virtualhost for static with reverse proxy settings<br>
  - create virtualhost for apps with revers proxy settings<br>
-<brNote</b>: It can be done with one file, I want to try doing it with state.apache. For apps host have already used file.managed<br>
+<b>Note</b>: It can be done with one file, I want to try doing it with state.apache. For apps host have already used file.managed<br>
  - enable sites and reload apache<br>
 <b>appserver.sls</b><br>
  - install tomcat7 and tomcat7-admin (for managing of deploy)<br>
