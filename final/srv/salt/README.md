@@ -5,10 +5,10 @@ Install java<br>
 <b>webserver.sls</b><br>
  - install apache<br>
  - check if running<br>
- - enable proxy and rewrite modules (I used proxy module instead rewrite module or mod_jk, because want our apache must working as proxy, also I want try something new for me)<br>
+ - enable proxy and rewrite modules (I used proxy module instead rewrite module or mod_jk, because I'd like to set apache as proxy, also I'd try something new for me)<br>
  - disable default hello apache site (don't need it)<br>
  - create static directory for static content<br>
- - dowload content from s3 (used cmd.run because I have no idea how right and simple dowload several files. Because file.managed and s3.get can download only one file. Also I found a bug with s3://-links in last salt version. We can use them only once, next time we get 'hsm' error even if delete file from filesystem)<br>
+ - dowload content from s3 (used cmd.run because I have no idea how right and simple dowload several files. Because file.managed and s3.get can download only one file. Also I found a <a href='https://github.com/saltstack/salt/issues/39903' target=_blank>bug</a> with s3://-links in last salt version. We can use them only once, next time we get 'hsm' error even if delete file from filesystem)<br>
  - create virtualhost for static with reverse proxy settings<br>
  - create virtualhost for apps with revers proxy settings<br>
 <b>Note</b>: It can be done with one file, I want to try doing it with state.apache. For apps host have already used file.managed<br>

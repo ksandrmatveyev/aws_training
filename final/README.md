@@ -9,7 +9,7 @@
 5) Instance Profile for acccess to "deployment" bucket with WARs,Salt States, Salt Key Pairs<br>
 6) Instance Profile for access to "content" bucket with static content for apache<br>
 
-<b>Note</b>: Can't use several instance profiles with one instance or several instance roles with one instance profile (for now)<br>
+<b>Note</b>: Can't use several instance profiles with one instance or several instance roles with one instance profile (<a href='http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html#w1ab2c19c12d512c13' target=_blank>for now</a>)<br>
 
 7) Salt-master instance: install salt-master, aws cli, download and auto-accept predefined public keys (the same public key for all future minions), dowload salt states with pillars (keys,states and pillars from s3 deployment bucket)<br>
 8) 3 salt-minions: install salt-minion, aws cli, key pairs (the same for all instances), configure minions (set local IP of salt-master (must be changed,because by default hostname "salt") and write role to grains depending on instance goal)<br>
