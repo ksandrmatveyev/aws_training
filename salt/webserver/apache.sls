@@ -20,6 +20,14 @@ enable-rewrite-module:
 disable-default-site:
   apache_site.disabled:
     - name: 000-default.conf
+create-directory:
+  file.directory:
+    - name: /var/www/static
+copy-all-from-s3content:
+  cmd.run:
+    - name: 'aws s3 sync s3://{{ pillar['s3bucketcontent'] }} /var/www/static/'
+    - require:
+      - file: create-directory
 /etc/apache2/sites-available/static-host.conf:
   apache.configfile:
     - config:
@@ -27,8 +35,8 @@ disable-default-site:
           this: '*:80'
           DocumentRoot: /var/www/static
           ProxyRequests: 'off'
-          ProxyPass: '/static/ http://{{ pillar['webIP'] }}:80/static/'
-          ProxyPassReverse: '/static/ http://{{ pillar['webIP'] }}:80/static/'
+          ProxyPass: '/static/ http://localhost:80/static/'
+          ProxyPassReverse: '/static/ http://localhost:80/static/'
           Location:
             this: /var/www/static
             Order: Deny,Allow
@@ -50,3 +58,7 @@ enable-apps-host:
     - name: apps-host
     - require:
         - file: create-apps-host
+restart-apache-service:
+  cmd:
+    - run
+    - name: service apache2 reload
