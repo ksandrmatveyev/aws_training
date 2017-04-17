@@ -1,0 +1,37 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "AWS CloudFormation Cross-Stack Reference Sample Template: Demonstrates how to reference resources from a different stack. This template provisions an EC2 instance in an EC2 Security Group provisioned in a different stack. **WARNING** This template creates an Amazon EC2 instance. You will be billed for the AWS resources used if you create a stack from this template.",
+
+  "Parameters": {
+    "NetworkStackName": {
+      "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
+      "Type": "String",
+      "MinLength" : 1,
+      "MaxLength" : 255,
+      "AllowedPattern" : "^[a-zA-Z][-a-zA-Z0-9]*$",
+      "Default" : "MasterStack"
+    }
+  },
+  "Resources" : {
+    "APP": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-49c9295f",
+        "KeyName": "awskeytest",
+        "InstanceType": "t2.micro",
+        "NetworkInterfaces" : [{
+          "GroupSet"                 : [{ "Fn::ImportValue" :  {"Fn::Sub": "${NetworkStackName}-SecurityGroupID" } }],
+          "AssociatePublicIpAddress" : "true",
+          "DeviceIndex"              : "0",
+          "DeleteOnTermination"      : "true",
+          "SubnetId"                 : { "Fn::ImportValue" : {"Fn::Sub": "${NetworkStackName}-SubnetID" } }
+        }],
+        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+             "#!/bin/bash -xe\n",
+             "echo ", { "Fn::ImportValue" :  {"Fn::Sub": "${NetworkStackName}-SaltmasterIP" } }, "> /home/ubuntu/show.txt", "\n"
+        ]]}}
+      }
+  }
+}
+}
