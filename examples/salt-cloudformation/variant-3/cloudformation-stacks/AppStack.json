@@ -81,12 +81,6 @@
                   }
                 },
                 "/' /etc/salt/minion\n",
-                "echo 'verify_master_pubkey_sign: True' >> /etc/salt/minion\n",
-                "aws s3 cp s3://",
-                {
-                  "Fn::ImportValue" : {"Fn::Sub": "${IAMStackName}-s3bucketDeployment" }
-                },
-                "/keys/master/master_sign.pub /etc/salt/pki/minion/\n",
                 "echo 'roles: appserver1' > /etc/salt/grains\n",
                 "service salt-minion start\n"
               ]
@@ -148,12 +142,6 @@
                   }
                 },
                 "/' /etc/salt/minion\n",
-                "echo 'verify_master_pubkey_sign: True' >> /etc/salt/minion\n",
-                "aws s3 cp s3://",
-                {
-                  "Fn::ImportValue" : {"Fn::Sub": "${IAMStackName}-s3bucketDeployment" }
-                },
-                "/keys/master/master_sign.pub /etc/salt/pki/minion/\n",
                 "echo 'roles: appserver2' > /etc/salt/grains\n",
                 "service salt-minion start\n"
               ]
