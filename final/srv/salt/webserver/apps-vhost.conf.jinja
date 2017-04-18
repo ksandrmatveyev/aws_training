@@ -1,8 +1,8 @@
 <VirtualHost *:80>
 ProxyRequests off
 ProxyPreserveHost On
-ProxyPass /app1 http://{{ pillar['app1IP'] }}:8080/{{ pillar['war-name'] }} retry=0 timeout=5
-ProxyPassReverse /app1 http://{{ pillar['app1IP'] }}:8080/{{ pillar['war-name'] }}
-ProxyPass /app2 http://{{ pillar['app2IP'] }}:8080/{{ pillar['war-name'] }} retry=0 timeout=5
-ProxyPassReverse /app2 http://{{ pillar['app2IP'] }}:8080/{{ pillar['war-name'] }}
+ProxyPass /app1 http://{{ salt['grains.get']('app1') }}:8080/{{ pillar['war-name'] }} retry=0 timeout=5
+ProxyPassReverse /app1 http://{{ salt['grains.get']('app1') }}:8080/{{ pillar['war-name'] }}
+ProxyPass /app2 http://{{ salt['grains.get']('app2') }}:8080/{{ pillar['war-name'] }} retry=0 timeout=5
+ProxyPassReverse /app2 http://{{ salt['grains.get']('app2') }}:8080/{{ pillar['war-name'] }}
 </VirtualHost>

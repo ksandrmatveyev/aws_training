@@ -10,7 +10,7 @@ Install java<br>
  - create static directory for static content<br>
  - dowload content from s3 (used cmd.run because I have no idea how right and simple dowload several files. Because file.managed and s3.get can download only one file. Also I found a <a href='https://github.com/saltstack/salt/issues/39903' target=_blank>bug</a> with s3://-links in last salt version. We can use them only once, next time we get 'hsm' error even if delete file from filesystem)<br>
  - create virtualhost for static with reverse proxy settings. Used state.apache<br>
- - create virtualhost for apps with revers proxy settings. Used file with Jinja template and grains<br>
+ - create virtualhost for apps with revers proxy settings. Used file with Jinja template<br>
 <b>Note</b>: It can be done with one file, I want to try doing it with state.apache. For apps host have already used file with Jinja template<br>
  - enable sites and reload apache<br>
 <b>appserver</b><br>

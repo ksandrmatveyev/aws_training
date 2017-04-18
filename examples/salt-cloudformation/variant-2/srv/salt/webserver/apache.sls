@@ -35,8 +35,8 @@ copy-all-from-s3content:
           this: '*:80'
           DocumentRoot: /var/www/static
           ProxyRequests: 'off'
-          ProxyPass: '/static/ http://localhost:80/static/'
-          ProxyPassReverse: '/static/ http://localhost:80/static/'
+          ProxyPass: '/static/ http://{{ pillar['webIP'] }}:80/static/'
+          ProxyPassReverse: '/static/ http://{{ pillar['webIP'] }}:80/static/'
           Location:
             this: /var/www/static
             Order: Deny,Allow

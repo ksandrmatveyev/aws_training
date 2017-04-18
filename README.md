@@ -19,8 +19,13 @@ c. May be use WaitCondition or CreatePolicy, but:<br>
  - first, we need deploy master instance to see its ip<br>
  - second, deploy minion instances and set master ip  to minion config<br>
  - third, after configuring minions run "salt-key"<br>
+d. IP through outputs and separated cloudformation stacks (works)<br>
 
 3) Salt can't be installed<br>
 a. Open 443 port, because using apt repo salt install via https<br>
 4) Can't use several instance profiles with one instance or several instance roles with one instance profile (<a href='http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html#w1ab2c19c12d512c13' target=_blank>for now</a>)<br>
 5) <a href='https://github.com/saltstack/salt/issues/39903' target=_blank>Issue</a> with state.file, which used s3:// links (salt version 2016.11.3). Can be pathed or use another state (as I use cmd.run)<br>
+6) Problem with git clone with ssh keys.<br>
+ - Userdata scripts run as root user<br>
+ - That's why config, private key, known_hosts are in /root/.ssh<br>
+ - That's why private key's security was set to 600 (chmod 600)<br>
