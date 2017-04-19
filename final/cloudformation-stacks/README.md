@@ -13,22 +13,26 @@
 <b>Note</b>: Can't use several instance profiles with one instance or several instance roles with one instance profile (<a href='http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html#w1ab2c19c12d512c13' target=_blank>for now</a>)<br>
 <b>MasterStack</b><br>
 <ul>
-get VPCId, Subnet name, InstanceProfile through prameters<br>
-install salt-master, aws cli, dowload salt pillars (from s3 deployment bucket)<br>
-<b>Used</b> simple <b>auto_accept</b> property in salt-master's config<br>
+ - get VPCId, Subnet name, InstanceProfile through prameters<br>
+ - install salt-master, aws cli, dowload salt pillars (from s3 deployment bucket)<br>
+ - used reactor and verifying signature of master public key. Added property 'master_sign_pubkey: True' in salt-master's config, restart master and push sign_key to s3<br>
 </ul>
 <b>AppStack</b><br>
 <ul>
-get VPCId, Subnet name, InstanceProfile through prameters<br>
-get local IPs of salt-master through prameter<br>
-app-minions: install salt-minion, aws cli, configure minions (set local IP of salt-master (must be changed,because by default hostname "salt") and write role to grains depending on instance goal)<br>
-pass local IPs of app-minions through otputs<br>
+ - get VPCId, Subnet name, InstanceProfile through prameters<br>
+ - get local IPs of salt-master through parameter<br>
+ - app-minions: install salt-minion, aws cli, configure minions (set local IP of salt-master (must be changed,because by default hostname "salt") and write role to grains depending on instance goal. Also added property 'verify_master_pubkey_sign: True' in salt-minion's config,  pull sign_key from s3 and restart minion)<br>
+ - pass local IPs of app-minions through otputs<br>
 </ul>
 <b>WebStack</b><br>
 <ul>
-get VPCId, Subnet name, InstanceProfile through prameters<br>
-get local IPs of salt-master through prameter<br>
-get local IPs of app-minions through prameters and set them as web-minion grains<br>
-web-minion: install salt-minion, aws cli, configure minion (set local IP of salt-master (must be changed,because by default hostname "salt") and write role to grains depending on instance goal)<br>
+ - get VPCId, Subnet name, InstanceProfile through prameters<br>
+ - get local IPs of salt-master through prameter<br>
+ - get local IPs of app-minions through prameters and set them as web-minion grains<br>
+ - web-minion: install salt-minion, aws cli, configure minion (set local IP of salt-master (must be changed,because by default hostname "salt") and write role to grains depending on instance goal. Also added property 'verify_master_pubkey_sign: True' in salt-minion's config,  pull sign_key from s3 and restart minion)<br>
 </ul>
-<b>Note</b>: Didn't use minion IDs (It's necessary if we want use predefined keys,they must named as minion ID. Also minion ID is a hostname by default. That's why we can changing them instead of using hard-reading EC2 hostnames). <b>Used</b> simple <b>auto_accept</b> property in salt-master's config<br>
+<b>Note</b>: Instead of using reactor and verifying signature of master public key we can use:<br>
+<ul>
+ - use <b>minion IDs</b> (It's necessary if we want use predefined keys,they must named as minion ID. Also minion ID is a hostname by default. That's why we can changing them instead of using hard-reading EC2 hostnames). 
+ - use simple <b>auto_accept</b> property in salt-master's config<br>
+ All these variants in "examples" folder
