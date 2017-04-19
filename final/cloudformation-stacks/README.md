@@ -33,6 +33,6 @@
 </ul>
 <b>Note</b>: Instead of using reactor and verifying signature of master public key we can use:<br>
 <ul>
- - use <b>minion IDs</b> (It's necessary if we want use predefined keys,they must named as minion ID. Also minion ID is a hostname by default. That's why we can changing them instead of using hard-reading EC2 hostnames). 
+ - use <b>minion IDs</b> (It's necessary if we want use predefined keys,they must named as minion ID. Also minion ID is a hostname by default. That's why we can changing them instead of using hard-reading EC2 hostnames). <br>
  - use simple <b>auto_accept</b> property in salt-master's config<br>
  All these variants in "examples" folder

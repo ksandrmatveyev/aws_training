@@ -1,5 +1,8 @@
 <b>Final task2</b><br>
-final folder<br>
+<b>final</b><br>
+final solution of task with salt files and cloudformtion templates<br>
+Used separated cloudformation templates, verifying signature of public master key<br>
+Other full worked variants (with predefined keys or autoaccepted configuration) in "examples/salt-cloudformation"<br>
 <b>Examples</b><br>
 Variants of aws cloudformation templates and salt states<br>
 <b>Issues</b><br>
