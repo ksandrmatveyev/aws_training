@@ -1,15 +1,5 @@
-<b># Python task</b><br>
-Part1 of task<br>
-The script should create a stack from the template and wait until the stack status changes from "IN PROGRESS" to "COMPLETE" or "FAILED". <br>
-You can find the detailed description of the parameters below:<br>
-	○ action (create, update, delete);<br>
-	○ stack name;<br>
-	○ template file name (can based on the stack name);<br>
-	○ stack parameters;<br>
-	○ log level (info, debug, error; by default info);<br>
-log file name (by default to stdout);<br>
-
-<b># Solution for Part1</b><br>
+<b># Python Task Part1</b><br>
+<b># Solution</b><br>
 "stack_wrapper.py" in "part1" fodler<br>
 Short brief, that show what I use:<br>
 	cloudformation templates for testing<br>
