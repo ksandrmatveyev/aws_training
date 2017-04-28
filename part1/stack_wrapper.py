@@ -7,8 +7,13 @@ from botocore.exceptions import BotoCoreError, ClientError, WaiterConfigError, W
 
 LOGFORMAT = '%(asctime)s | %(levelname)s | %(funcName)s | %(message)s'
 DATEFORMAT = '%m/%d/%Y %I:%M:%S %p'
-
+WAITERS = {
+    'create': 'stack_create_complete',
+    'update': 'stack_update_complete',
+    'delete': 'stack_delete_complete',
+}
 logger = logging.getLogger(__name__)
+client = boto3.client('cloudformation')
 
 
 # Configuring argparse
@@ -70,11 +75,6 @@ def get_args():
     return parser.parse_args()
 
 
-# add cf client
-client = boto3.client('cloudformation')
-
-
-# try open and read a file
 def open_file(file_name):
     """try to open and read cloudformation template file"""
 
@@ -114,14 +114,21 @@ def set_waiter(stackname, waiter_type):
 
     try:
         # add waiter
-        waiter = client.get_waiter(waiter_type)
+        waiter = client.get_waiter(WAITERS[waiter_type])
         # wait until stack would be updated
         waiter.wait(StackName=stackname)
+    except KeyError as error:
+        logger.error("Key Error: {error_message}".format(error_message=error))
+        exit(1)
     except (WaiterError, WaiterConfigError) as error:
         logger.error("Waiter Error: {error_message}".format(error_message=error))
         exit(1)
     else:
-        logger.info("Stack \"{stack}\" get status:  {status}".format(stack=stackname, status=waiter_type))
+        logger.info("{operation} stack \"{stack}\": {status}".format(operation=waiter_type,
+                                                                     stack=stackname,
+                                                                     status=WAITERS[waiter_type]
+                                                                     )
+                    )
 
 
 def create_stack(args):
@@ -129,6 +136,7 @@ def create_stack(args):
     Then creates aws cloudformation stack from this template
     """
 
+    action = 'create'
     read_template = open_file(args.file)
     validate_file(read_template)
     created_stack = client.create_stack(
@@ -140,7 +148,7 @@ def create_stack(args):
         ]
     )
     logger.debug("Create stack request: {request}".format(request=created_stack))
-    set_waiter(args.stack_name, 'stack_create_complete')
+    set_waiter(args.stack_name, action)
 
 
 def update_stack(args):
@@ -148,6 +156,7 @@ def update_stack(args):
     then updates aws cloudformation stack from this template
     """
 
+    action = 'update'
     read_template = open_file(args.file)
     validate_file(read_template)
     updated_stack = client.update_stack(
@@ -159,7 +168,7 @@ def update_stack(args):
         ]
     )
     logger.debug("Update stack request: {request}".format(request=updated_stack))
-    set_waiter(args.stack_name, 'stack_update_complete')
+    set_waiter(args.stack_name, action)
 
 
 def delete_stack(args):
@@ -167,12 +176,13 @@ def delete_stack(args):
     then deletes this stack
     """
 
+    action = 'delete'
     stack_exists(args.stack_name)
     deleted_stack = client.delete_stack(
         StackName=args.stack_name,
     )
     logger.debug("Delete stack request: {request}".format(request=deleted_stack))
-    set_waiter(args.stack_name, 'stack_delete_complete')
+    set_waiter(args.stack_name, action)
 
 
 def main():

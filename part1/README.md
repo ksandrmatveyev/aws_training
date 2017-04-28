@@ -19,4 +19,5 @@ Short brief, that show what I use:<br>
 Improvements since last commit:<br>
 	○ handled almost all exceptions from functions in main function<br>
 	○ removed checking of log level and log file arguments. They are not needed<br>
+	○ added dictionary for waiters<br>
  
