@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
 		gateway.vm.network "forwarded_port", guest: 22, host: 2221, id: "ssh", host_ip: "127.0.0.1"
 		gateway.vm.network "private_network", ip:"192.168.10.50", mask:"255.255.255.0",
     virtualbox__intnet: "intnet1", auto_config: false
-	gateway.vm.network "private_network", ip:"10.0.0.45", mask:"255.255.255.0",
+		gateway.vm.network "private_network", ip:"10.0.0.45", mask:"255.255.255.0",
     virtualbox__intnet: "intnet2", auto_config: false
 	end
 
