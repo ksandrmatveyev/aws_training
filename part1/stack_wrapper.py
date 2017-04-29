@@ -5,20 +5,28 @@ import argparse
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError, WaiterConfigError, WaiterError
 
+# for loging configuration
 LOGFORMAT = '%(asctime)s | %(levelname)s | %(funcName)s | %(message)s'
 DATEFORMAT = '%m/%d/%Y %I:%M:%S %p'
+# for boto3 stack functions
+ACTION_CREATE = 'create'
+ACTION_UPDATE = 'update'
+ACTION_DELETE = 'delete'
+# types for setting waiters in waiter function
 WAITERS = {
-    'create': 'stack_create_complete',
-    'update': 'stack_update_complete',
-    'delete': 'stack_delete_complete',
+    ACTION_CREATE: 'stack_create_complete',
+    ACTION_UPDATE: 'stack_update_complete',
+    ACTION_DELETE: 'stack_delete_complete',
 }
 logger = logging.getLogger(__name__)
 client = boto3.client('cloudformation')
 
 
-# Configuring argparse
 def get_args():
-    """Parsing CLI commands"""
+    """Parsing CLI commands using argparse with subparsers for common stack functions.
+    Dublication of log and logfile arguments, because subparsers are using
+    """
+
     parser = argparse.ArgumentParser(description='AWS stack wrapper')
     subparsers = parser.add_subparsers()
 
@@ -126,17 +134,15 @@ def set_waiter(stackname, waiter_type):
     else:
         logger.info("{operation} stack \"{stack}\": {status}".format(operation=waiter_type,
                                                                      stack=stackname,
-                                                                     status=WAITERS[waiter_type]
-                                                                     )
-                    )
+                                                                     status=WAITERS[waiter_type]))
 
 
 def create_stack(args):
     """Reads and validates cloudformation template file,
-    Then creates aws cloudformation stack from this template
+    Then creates aws cloudformation stack from this template.
+    Finally, set waiter using function with constant action
     """
 
-    action = 'create'
     read_template = open_file(args.file)
     validate_file(read_template)
     created_stack = client.create_stack(
@@ -148,15 +154,15 @@ def create_stack(args):
         ]
     )
     logger.debug("Create stack request: {request}".format(request=created_stack))
-    set_waiter(args.stack_name, action)
+    set_waiter(args.stack_name, ACTION_CREATE)
 
 
 def update_stack(args):
     """Reads and validates cloudformation template file,
-    then updates aws cloudformation stack from this template
+    then updates aws cloudformation stack from this template.
+    Finally, set waiter using function with constant action
     """
 
-    action = 'update'
     read_template = open_file(args.file)
     validate_file(read_template)
     updated_stack = client.update_stack(
@@ -168,21 +174,21 @@ def update_stack(args):
         ]
     )
     logger.debug("Update stack request: {request}".format(request=updated_stack))
-    set_waiter(args.stack_name, action)
+    set_waiter(args.stack_name, ACTION_UPDATE)
 
 
 def delete_stack(args):
     """Checks if aws cloudformation stack exists,
-    then deletes this stack
+    then deletes this stack.
+    Finally, set waiter using function with constant action
     """
 
-    action = 'delete'
     stack_exists(args.stack_name)
     deleted_stack = client.delete_stack(
         StackName=args.stack_name,
     )
     logger.debug("Delete stack request: {request}".format(request=deleted_stack))
-    set_waiter(args.stack_name, action)
+    set_waiter(args.stack_name, ACTION_DELETE)
 
 
 def main():
@@ -191,6 +197,7 @@ def main():
     configuring logging config and
     handling exceptions of functions, which used those arguments    
     """
+
     args = get_args()
     loglevel = args.log
     numeric_level = getattr(logging, loglevel.upper(), None)
