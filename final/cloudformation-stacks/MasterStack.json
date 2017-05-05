@@ -67,7 +67,12 @@
                 "curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install awscli\n",
                 "curl -L https://bootstrap.saltstack.com -o install_salt.sh && sh install_salt.sh -P -M -N\n",
                 "service salt-master stop\n",
-                "sed -i 's/#auto_accept: False/auto_accept: True/' /etc/salt/master\n",
+                "echo 'master_sign_pubkey: True' >> /etc/salt/master\n",
+                "aws s3 cp s3://",
+                {
+                  "Fn::ImportValue" : {"Fn::Sub": "${IAMStackName}-s3bucketDeployment" }
+                },
+                "/keys/master/reactor.conf /etc/salt/master.d/\n",
                 "service salt-master start\n",
                 "apt-get install git -y\n",
                 "aws s3 cp s3://",
@@ -82,7 +87,12 @@
                 {
                   "Fn::ImportValue" : {"Fn::Sub": "${IAMStackName}-s3bucketDeployment" }
                 },
-                "/srv3 /srv --recursive\n"
+                "/srv3 /srv --recursive\n",
+                "aws s3 cp /etc/salt/pki/master/master_sign.pub s3://",
+                {
+                  "Fn::ImportValue" : {"Fn::Sub": "${IAMStackName}-s3bucketDeployment" }
+                },
+                "/keys/master/\n"
               ]
             ]
           }
