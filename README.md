@@ -31,3 +31,8 @@ Improvements since last commit:<br>
 	○ removed checking of log level and log file arguments. They are not needed<br>
 	○ added dictionary for waiters<br>
 	○ added dictionary for waiters and constants for logging and stack functions<br>
+<br>
+<br>
+Part2 of task<br>
+added worked demo solution<br>
+adding comments in progress
