@@ -82,7 +82,6 @@ Linux: `./stack_wrapper.py create-stack StackName --config config.yaml --log INF
 #### Validate stacks:
 Windows: `python stack_wrapper.py validate-stacks --config config.yaml --log INFO --logfile log.log`  
 Linux: `./stack_wrapper.py validate-stacks --config config.yaml --log INFO --logfile log.log`  
-### Notes:
-- As you see above, I haven't handled capabilities yet (I'm working on that but I haven't had results for now)  
+### Notes:  
 - About repeating code inside create_stack(), update_stack(), delete_stack() functions.  I thought bout that and have no clue how can I get rid of repeating code, if I must create/update/delete stacks recursively (using `for` loop).  In addition, I have a little different logic inside loops. Also, I think abot using functions one inside another (like a pipeline), but It isn't a solution, is it?  
 - I have 5 exit points from my program, because before I had been debugging all functions and decided to leave exit points, where I had diferent logic. Otherwise, if I had handled all expections in main() function I wouldn't have known where I got a bug
