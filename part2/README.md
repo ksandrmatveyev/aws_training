@@ -73,5 +73,6 @@ The stack structure is stored in a file (yaml) and  includes following:
 ### Using examples
 Windows: `python stack_wrapper.py create-stack StackName --config config.yaml --log INFO --logfile log.log`  
 Linux: `./stack_wrapper.py create-stack StackName --config config.yaml --log INFO --logfile log.log`  
-#### Note:
-As you see above I don't handle capabilities and have dublicated logic inside create_Stack(), update_stack(), delete_Stack() functions. I'm working on that but I haven't had results for now :(
+#### Notes:
+As you see above, I haven't handled capabilities yet and have dublicated logic inside create_stack(), update_stack(), delete_Stack() functions. I'm working on that but I haven't had results for now :(  
+Also, I have 5 exit points from my program, because before I had been debugging all functions and decided to leave exit points, where I had diferent logic. Otherwise, if I had handled all expections in main() function I wouldn't have known where I got a bug
