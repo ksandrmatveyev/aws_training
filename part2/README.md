@@ -11,7 +11,7 @@ The stack structure is stored in a file (yaml) and  includes following:
 - dependencies (the order of creation and deletion)
 - parameters passed to the stack
 ### Solution
-1. Cloudformation templates `*.json` from [salstack task](aws_training/final/cloudformation-stacks/README.md) for testing (in "examples" folder only a few templates)
+1. Cloudformation templates `*.json` from [salstack task](https://github.com/ksandrmatveyev/aws_training/blob/task2/final/cloudformation-stacks/README.md) for testing (in "examples" folder only a few templates)
 2. `config.yaml`, which include:
    - `name` - stack names
    - `template` - file paths to cloudformation templates (current directory)
@@ -74,5 +74,5 @@ The stack structure is stored in a file (yaml) and  includes following:
 Windows: `python stack_wrapper.py create-stack StackName --config config.yaml --log INFO --logfile log.log`  
 Linux: `./stack_wrapper.py create-stack StackName --config config.yaml --log INFO --logfile log.log`  
 #### Notes:
-As you see above, I haven't handled capabilities yet and have dublicated logic inside create_stack(), update_stack(), delete_Stack() functions. I'm working on that but I haven't had results for now :(  
+As you see above, I haven't handled capabilities yet and have dublicated logic inside create_stack(), update_stack(), delete_stack() functions. I'm working on that but I haven't had results for now :(  
 Also, I have 5 exit points from my program, because before I had been debugging all functions and decided to leave exit points, where I had diferent logic. Otherwise, if I had handled all expections in main() function I wouldn't have known where I got a bug
