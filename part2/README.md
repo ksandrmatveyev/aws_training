@@ -25,6 +25,7 @@ The stack structure is stored in a file (yaml) and  includes following:
   **Note: added help stdout. (if we don't use any cli parameter, we get error without that)**
    - `open_file()` function, which try open and read template file. If OK, close file and return it, otherwise get exception and exit.  
   **Note: exit point 1**
+   - `get_template_capabilities()` from read template
    - `get_template_params()` fucntion, which validate template (using validate_template() function and read  template as parameter) and get parameters from dictionary by key `Parameters`. If default value doesn't exists, set empty value. Return new sorted list of key-value pairs (Parameter: value)
    - `get_config()` fucntion, which try open and read yaml config file. If OK, return read config, otherwise exception and exit.  
   **Note: exit point 2**
@@ -43,6 +44,7 @@ The stack structure is stored in a file (yaml) and  includes following:
        - get template path by key 'template'
        - read template file by `open_file()`
        - get parameters by `match_parameters()`
+       - `get_template_capabilities()`
        - reads valid template file and creates stack with
        - if some stack already exists, continue creating with next. 
          - set waiter using `set_waiter()`  
@@ -55,6 +57,7 @@ The stack structure is stored in a file (yaml) and  includes following:
        - get template path by key 'template'
        - read template file by `open_file()`
        - get parameters by `match_parameters()`
+       - `get_template_capabilities()`
        - reads valid template file and creates stack with
        - if those stacks are already exist, updating them. 
          - set waiter using `set_waiter() ` 

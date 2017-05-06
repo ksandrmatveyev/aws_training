@@ -112,7 +112,7 @@ def get_args():
                                  default=None,
                                  help='write log to file')
     parser_validate.set_defaults(func=validate_stack)
-    
+
     # if no arguments, show help
     if len(argv) == 1:
         parser.print_help()
@@ -136,6 +136,18 @@ def open_file(file_path):
         logger.info("Template \"{file}\" was read".format(file=file_path))
         template_opened.close()
         return read_template
+
+
+def get_template_capabilities(read_template):
+    """return capabilities"""
+
+    valid_template = client.validate_template(
+        TemplateBody=read_template
+    )
+    template_capabilities = []
+    if valid_template.get('Capabilities'):
+        template_capabilities = valid_template.get('Capabilities')
+    return template_capabilities
 
 
 def get_template_params(read_template):
@@ -291,16 +303,14 @@ def create_stack(args):
         template_path = configfile[stack_key].get('template')
         read_template = open_file(template_path)
         params = match_parameters(stack_key, read_template, configfile)
+        capabils = get_template_capabilities(read_template)
         if stack_exists(stack_key):
             continue
         created_stack = client.create_stack(
             StackName=stack_key,
             TemplateBody=read_template,
             Parameters=params,
-            Capabilities=[
-                'CAPABILITY_IAM',
-                'CAPABILITY_NAMED_IAM',
-            ]
+            Capabilities=capabils
         )
         logger.debug("Create stack request: {request}".format(request=created_stack))
         set_waiter(stack_key, ACTION_CREATE)
@@ -318,15 +328,13 @@ def update_stack(args):
         template_path = configfile[stack_key].get('template')
         read_template = open_file(template_path)
         params = match_parameters(stack_key, read_template, configfile)
+        capabils = get_template_capabilities(read_template)
         if stack_exists(stack_key):
             updated_stack = client.update_stack(
                 StackName=stack_key,
                 TemplateBody=read_template,
                 Parameters=params,
-                Capabilities=[
-                    'CAPABILITY_IAM',
-                    'CAPABILITY_NAMED_IAM',
-                ]
+                Capabilities=capabils
             )
             logger.debug("Update stack request: {request}".format(request=updated_stack))
             set_waiter(stack_key, ACTION_UPDATE)
