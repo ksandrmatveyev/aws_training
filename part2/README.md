@@ -36,7 +36,7 @@ The stack structure is stored in a file (yaml) and  includes following:
    - `get_dict_of_lists_dependency()` function, which returns dictionary of lists as value for each key from read config file (as fucntion parameter). Needed for creating some "chain" for deleting stacks
    - `resolve_create_dependencies()` fucntion, which returns list of stack dependencies chain from read config for creating of assigned stack by key 'require' (empty if value doesn't exist)
    - `resolve_delete_dependencies()` funcion, which returns list of stack dependencies chain from dictionary (which `get_dict_of_lists_dependency()` returns) for deleting of assigned stack
-   - `create_stack` function, which creates dependent stacks consistently. If some stack already exists, continue creating with next. Details:
+   - `create_stack()` function, which creates dependent stacks consistently. If some stack already exists, continue creating with next. Details:
      - use `get_config()`,
      - `resolve_create_dependencies()`,
      - `for` loop
@@ -48,7 +48,7 @@ The stack structure is stored in a file (yaml) and  includes following:
          - set waiter using `set_waiter()`  
 
      **Note:** capabilities (hard coded for now)
-   - `updade_stack` function, which updates dependent stacks consistently, if those stacks are already exist. Details:
+   - `updade_stack()` function, which updates dependent stacks consistently, if those stacks are already exist. Details:
      - use `get_config()`,
      - `resolve_create_dependencies()`,
      - `for` loop
@@ -60,7 +60,7 @@ The stack structure is stored in a file (yaml) and  includes following:
          - set waiter using `set_waiter() ` 
 
      **Note:** capabilities (hard coded for now)
-   - `delete_stack` function, which deletes dependent stacks consistently, if those stacks are already exist. Details:
+   - `delete_stack()` function, which deletes dependent stacks consistently, if those stacks are already exist. Details:
      - use `get_config()`,
      - `get_dict_of_lists_dependency()`,
      - `resolve_delete_dependencies()`,
@@ -72,9 +72,13 @@ The stack structure is stored in a file (yaml) and  includes following:
    - `main` function as entry point, where we get arguments fom parsers, configure logging and handle all exceptions from stack_exists, create_stack, updade_stack, delete_stack.  
 **Note: exit point 5**
    - `if __name__ == '__main__'`, which run main function  
-### Using examples
+### How To use this:
+#### Create stack:
 Windows: `python stack_wrapper.py create-stack StackName --config config.yaml --log INFO --logfile log.log`  
 Linux: `./stack_wrapper.py create-stack StackName --config config.yaml --log INFO --logfile log.log`  
-#### Notes:
+#### Validate stacks:
+Windows: `python stack_wrapper.py validate-stacks --config config.yaml --log INFO --logfile log.log`  
+Linux: `./stack_wrapper.py validate-stacks --config config.yaml --log INFO --logfile log.log`  
+### Notes:
 As you see above, I haven't handled capabilities yet and have dublicated logic inside create_stack(), update_stack(), delete_stack() functions. I'm working on that but I haven't had results for now :(  
 Also, I have 5 exit points from my program, because before I had been debugging all functions and decided to leave exit points, where I had diferent logic. Otherwise, if I had handled all expections in main() function I wouldn't have known where I got a bug
