@@ -37,36 +37,38 @@ The stack structure is stored in a file (yaml) and  includes following:
    - `resolve_create_dependencies()` fucntion, which returns list of stack dependencies chain from read config for creating of assigned stack by key 'require' (empty if value doesn't exist)
    - `resolve_delete_dependencies()` funcion, which returns list of stack dependencies chain from dictionary (which `get_dict_of_lists_dependency()` returns) for deleting of assigned stack
    - `create_stack` function, which creates dependent stacks consistently. If some stack already exists, continue creating with next. Details:
-     - use get_config(),
-     - resolve_create_dependencies(),
-     - for loop
+     - use `get_config()`,
+     - `resolve_create_dependencies()`,
+     - `for` loop
        - get template path by key 'template'
        - read template file by `open_file()`
-       - get parameters by match_parameters()
+       - get parameters by `match_parameters()`
        - reads valid template file and creates stack with
        - if some stack already exists, continue creating with next. 
-         - set waiter using set_waiter()  
+         - set waiter using `set_waiter()`  
 
      **Note:** capabilities (hard coded for now)
    - `updade_stack` function, which updates dependent stacks consistently, if those stacks are already exist. Details:
-     - use get_config(),
-     - resolve_create_dependencies(),
-     - for loop
+     - use `get_config()`,
+     - `resolve_create_dependencies()`,
+     - `for` loop
        - get template path by key 'template'
        - read template file by `open_file()`
-       - get parameters by match_parameters()
+       - get parameters by `match_parameters()`
        - reads valid template file and creates stack with
        - if those stacks are already exist, updating them. 
-         - set waiter using set_waiter()  
+         - set waiter using `set_waiter() ` 
 
      **Note:** capabilities (hard coded for now)
    - `delete_stack` function, which deletes dependent stacks consistently, if those stacks are already exist. Details:
-     - use get_config(),
-     - get_dict_of_lists_dependency(),
-     - resolve_delete_dependencies(),
-     - for loop
+     - use `get_config()`,
+     - `get_dict_of_lists_dependency()`,
+     - `resolve_delete_dependencies()`,
+     - `for` loop
        - if those stacks are already exist, updating them.
-         - set waiter using set_waiter()
+         - set waiter using `set_waiter()`
+   - `validate_stack()` function, which checks status of stacks from config file (using `get_config()` function)  
+**Note: catch exception inside for loop, becuase it's only one way to write message without termination
    - `main` function as entry point, where we get arguments fom parsers, configure logging and handle all exceptions from stack_exists, create_stack, updade_stack, delete_stack.  
 **Note: exit point 5**
    - `if __name__ == '__main__'`, which run main function  
