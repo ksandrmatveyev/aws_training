@@ -25,37 +25,44 @@ The stack structure is stored in a file (yaml) and  includes following:
   **Note: added help stdout. (if we don't use any cli parameter, we get error without that)**
    - `open_file()` function, which try open and read template file. If OK, close file and return it, otherwise get exception and exit.  
   **Note: exit point 1**
-   - `prepare_stacks()`, which added:
-     - stack name (as function parameter),
-     - cf template (read using `open_file()`), 
-     - parameters and capabilities (using namedtuple from `validate_template()`) to own numedtuple
-   - `validate_template()`, which validate template body and return nametuple witj parameters (using mathc_parameter)
-   - `get_template_params()` fucntion, which get parameters from valid template.  Return yield parameter
-   - `match_parameters`, which get parametrs from config and usng flag write parametrs to list and return it if parameterts exist
+   - `get_template_capabilities()` from read template
+   - `get_template_params()` fucntion, which validate template (using validate_template() function and read  template as parameter) and get parameters from dictionary by key `Parameters`. If default value doesn't exists, set empty value. Return new sorted list of key-value pairs (Parameter: value)
    - `get_config()` fucntion, which try open and read yaml config file. If OK, return read config, otherwise exception and exit.  
   **Note: exit point 2**
+   - `match_parameters()` fucntion, which try to get template parameters (using `get_template_params()` fucntion) by key and search them in config file (if exists, use parameter value from config file). If OK, return list of dictionaries (key-value pairs), otherwise exception and exit.  
+  **Note: exit point 3**
    - `stack_exists()` function, which get response from AWS if stack exists. Needed for action stack functions. Also, It allows us continue create/update from next stack, if previuos stack already exists or delete stack if it already exists. Return True/False
    - `set_waiter()` function, which try to create waiter and waite for AWS response, otherwise exception and exit.  
-  **Note: exit point 3**
+  **Note: exit point 4**
    - `get_dict_of_lists_dependency()` function, which returns dictionary of lists as value for each key from read config file (as fucntion parameter). Needed for creating some "chain" for deleting stacks
    - `resolve_create_dependencies()` fucntion, which returns list of stack dependencies chain from read config for creating of assigned stack by key 'require' (empty if value doesn't exist)
    - `resolve_delete_dependencies()` funcion, which returns list of stack dependencies chain from dictionary (which `get_dict_of_lists_dependency()` returns) for deleting of assigned stack
    - `create_stack()` function, which creates dependent stacks consistently. If some stack already exists, continue creating with next. Details:
      - use `get_config()`,
      - `resolve_create_dependencies()`,
-     - get stacks using `prepare_stacks()`
      - `for` loop
-       - if some stack already exists, continue creating with next
-       - create_stack() with data from namedtuple(stack)
-       - set waiter using `set_waiter() `
+       - get template path by key 'template'
+       - read template file by `open_file()`
+       - get parameters by `match_parameters()`
+       - `get_template_capabilities()`
+       - reads valid template file and creates stack with
+       - if some stack already exists, continue creating with next. 
+         - set waiter using `set_waiter()`  
+
+     **Note:** capabilities (hard coded for now)
    - `updade_stack()` function, which updates dependent stacks consistently, if those stacks are already exist. Details:
      - use `get_config()`,
      - `resolve_create_dependencies()`,
-     - get stacks using `prepare_stacks()`
      - `for` loop
-       - if some stack already exists, update it
-       - create_stack() with data from namedtuple(stack)
-       - set waiter using `set_waiter() `
+       - get template path by key 'template'
+       - read template file by `open_file()`
+       - get parameters by `match_parameters()`
+       - `get_template_capabilities()`
+       - reads valid template file and creates stack with
+       - if those stacks are already exist, updating them. 
+         - set waiter using `set_waiter() ` 
+
+     **Note:** capabilities (hard coded for now)
    - `delete_stack()` function, which deletes dependent stacks consistently, if those stacks are already exist. Details:
      - use `get_config()`,
      - `get_dict_of_lists_dependency()`,
@@ -66,7 +73,7 @@ The stack structure is stored in a file (yaml) and  includes following:
    - `validate_stack()` function, which checks status of stacks from config file (using `get_config()` function)  
 **Note: catch exception inside for loop, becuase it's only one way to write message without termination**
    - `main` function as entry point, where we get arguments fom parsers, configure logging and handle all exceptions from stack_exists, create_stack, updade_stack, delete_stack.  
-**Note: exit point 4**
+**Note: exit point 5**
    - `if __name__ == '__main__'`, which run main function  
 ### How To use this:
 #### Create stack:
