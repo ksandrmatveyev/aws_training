@@ -1,34 +1,26 @@
-<b># linux Task</b><br>
-Gateway machine<br>
-	- interfaces<br>
-		○ with access to internet<br>
-		○ 192.168.10.50/24<br>
-		○ 10.0.0.45/24<br>
-	- iptables<br>
-		○ app1 and app2 machines can access each other<br>
-Application machines (app1 and app2)<br>
-	- interfaces<br>
-		○ app1 subnet 192.168.10.0/24<br>
-		○ app2 subnet 10.0.0.0/24<br>
-default gateway: Gateway machine<br>
+# step1
+previous task
 
-<b>#Solution</b><br>
-Up 3 machines with predefined but not configured network interfaces:<br>
-	○ gateway<br>
-	○ app1<br>
-	○ app2<br>
-Configured Gateway:<br>
-	○ enable ipv4 forwarding using file, which added "sysctl.d" folder<br>
-	○ added two network interfaces (192.168.10.50 and 10.0.0.45) using files, which added to "interfaces.d" folder<br>
-	○ restart VM<br>
-	○ added iptables rules:<br>
-		○ ○ -A FORWARD -i eth1 -o eth2 -j ACCEPT<br>
-		○ ○ -A FORWARD -i eth2 -o eth1 -j ACCEPT<br>
-Configured APP1:<br>
-	○ added network interface (ip 192.168.10.51 with gateway 192.168.10.50) using file, which added to "interfaces.d" folder<br>
-	○ restart VM<br>
-Configured APP2:<br>
-	○ added network interface (ip 10.0.0.46 with gateway 10.0.0.45) using file, which added to "interfaces.d" folder<br>
-	○ restart VM<br>
-Ran ping or ssh<br>
+# step2
+- Gateway machine  
+  - DHCP server
+    - gateway network is configured manually
+    - app machine networks are configured via DHCP
+  - DNS server
+    - gateway machine has to hostname gateway.training.com
+    - gateway hostname should resolved from each private subnet
+    - other hostnames have to resolve the default DNS server from public network (Interface1)
+  - interfaces
+    - Interface1, public network with access to internet
+    - Interface2, private network 1, IP: 192.168.10.50, SUBNET MASK: 192.168.10.0/26
+    - Interface3, private network 2, IP: 10.0.0.45, SUBNET MASK: 10.0.0.0/26
+  - iptables
+    - machines from private network 1 and 2 can access to each other
+    - machines from private network 2 can access to internet
+- Application machines (app1 and app2)
+  - DHCP client
+  - interfaces
+    - all network settings are received from the DHCP server
+    - app1 SUBNET 192.168.10.0/26
+    - app2 SUBNET 10.0.0.0/26
 
