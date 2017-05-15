@@ -1,5 +1,27 @@
-# step2
-### HowToIDid:
+### Task description
+- Gateway machine  
+  - DHCP server
+    - gateway network is configured manually
+    - app machine networks are configured via DHCP
+  - DNS server
+    - gateway machine has to hostname gateway.training.com
+    - gateway hostname should resolved from each private subnet
+    - other hostnames have to resolve the default DNS server from public network (Interface1)
+  - interfaces
+    - Interface1, public network with access to internet
+    - Interface2, private network 1, IP: 192.168.10.50, SUBNET MASK: 192.168.10.0/26
+    - Interface3, private network 2, IP: 10.0.0.45, SUBNET MASK: 10.0.0.0/26
+  - iptables
+    - machines from private network 1 and 2 can access to each other
+    - machines from private network 2 can access to internet
+- Application machines (app1 and app2)
+  - DHCP client
+  - interfaces
+    - all network settings are received from the DHCP server
+    - app1 SUBNET 192.168.10.0/26
+    - app2 SUBNET 10.0.0.0/26
+
+### HowIDidIt:
 1. Up 3 VMs manually:
   - app1 with 1 internal network ("intnet1")
   - app2 with 1 internal network ("intnet2")
@@ -7,7 +29,7 @@
 2. Install `isc-dhcp-server` (dhcp server) and `bind9` (dns server)
 3. Add files from needed folders (called as VMs) to each VM
 4. Restart VMs (better)
-5. Run `iptables.sh` on Gateway VM
+5. Run `sudo /bin/bash iptables.sh` on Gateway VM
 
 ### Explanation:
  - On App1:
@@ -34,11 +56,14 @@
    - added iptables rules for accessing to internet via nat interface (eth0) of gateway for machines in 10.0.0.0/26 (eth2) only (our App2 VM):
 ```
 #!/bin/bash
-sudo iptables -A FORWARD -i eth1 -o eth0 -j REJECT &&\
-sudo iptables -A FORWARD -i eth0 -o eth1 -j REJECT &&\
-sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -A FORWARD -i eth1 -o eth0 -j REJECT &&\
+iptables -A FORWARD -i eth0 -o eth1 -j REJECT &&\
+iptables -A FORWARD -i eth0 -o eth2 -m state --state RELATED,ESTABLISHED -j ACCEPT &&\
+iptables -A FORWARD -i eth2 -o eth0 -j ACCEPT &&\
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 ```
 **Note:** 
  - Rejected connections for eth1, because otherwise they had accessing, too. 
- - Didn't add rules for accepting traffic from eth2 (internal) to eth0 (nat), because it is allow by default
+ - ~~Didn't add rules for accepting traffic from eth2 (internal) to eth0 (nat), because it is allow by default~~ 
+ - Added rules for accepting traffic from eth2 (internal) to eth0 (nat) securely (Packets ingressing from the public network (eth0) are accepted for forwarding out to the private network (eth2) if and only if the ingressing public packet is related to a conversation that was established by a host on the private network)
  - Enabled masquerading for nat interface
